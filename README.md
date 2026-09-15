@@ -1,21 +1,27 @@
 # RAG Project (Retrieval-Augmented Generation)
 
-A lightweight Retrieval-Augmented Generation (RAG) system built with [LlamaIndex](https://www.llamaindex.ai/), [ChromaDB](https://www.trychroma.com/), and [OpenRouter](https://openrouter.ai/).
+A lightweight, high-performance Retrieval-Augmented Generation (RAG) system built with [LlamaIndex](https://www.llamaindex.ai/), [ChromaDB](https://www.trychroma.com/), and [OpenRouter](https://openrouter.ai/).
 
 ## Overview
 
 - **Embeddings:** OpenRouter Embeddings API (`nvidia/nemotron-3-embed-1b:free`) via OpenAI-compatible client
-- **LLM:** OpenRouter (`nvidia/nemotron-3.5-lightning:free`)
+- **LLM:** OpenRouter (`liquid/lfm-2.5-2.6b:free`) for fast, concise customer assistant responses
+- **Chat Engine:** LlamaIndex `ContextChatEngine` with multi-turn conversation memory and system prompt handling
 - **Vector Store:** ChromaDB persistent storage (`./chroma_db`)
-- **Knowledge Base:** Product catalog files stored in `docs/`
+- **Knowledge Base:** 30 Kohler bathroom products stored in high-density pipe-delimited format across 5 category files in `docs/`
 
 ## Project Structure
 
 ```
 .
-├── docs/                     # Source documents to be indexed
-├── ingest.py                 # Embeds documents and stores them in ChromaDB
-├── query.py                  # Interactive query interface for RAG retrieval & QA
+├── docs/                     # Product catalog in Option 1 pipe-delimited format
+│   ├── faucets.txt           # 6 faucet models
+│   ├── showers.txt           # 6 shower systems & fixtures
+│   ├── toilets.txt           # 6 smart & conventional toilets
+│   ├── tubs_and_sinks.txt    # 6 soaking tubs, vessel & undermount sinks
+│   └── vanities.txt          # 6 vanities across styles and price points
+├── ingest.py                 # Embeds documents and persists vectors into ChromaDB
+├── query.py                  # Interactive chat interface with memory & RAG retrieval
 ├── test_llm.py               # Simple test script to verify OpenRouter LLM connection
 ├── requirements.txt          # Python dependencies
 ├── .env.example              # Environment variables template
@@ -36,7 +42,7 @@ A lightweight Retrieval-Augmented Generation (RAG) system built with [LlamaIndex
    ```
 
 3. **Configure Environment Variables:**
-   Create a `.env` file from the example:
+   Create a `.env` file from the template:
    ```bash
    cp .env.example .env
    ```
@@ -48,15 +54,21 @@ A lightweight Retrieval-Augmented Generation (RAG) system built with [LlamaIndex
 ## Usage
 
 ### 1. Ingest Documents
-Run `ingest.py` to chunk documents in `docs/`, compute embeddings via OpenRouter, and persist them into ChromaDB:
+Run `ingest.py` to index the 30 catalog products in `docs/` into ChromaDB:
 ```bash
 python ingest.py
 ```
 
-### 2. Query the Knowledge Base
-Run `query.py` to start an interactive question-answering session:
+### 2. Chat with the Assistant
+Run `query.py` to start an interactive chat session:
 ```bash
 python query.py
 ```
 
-Type your question and press Enter. Type `exit` to quit.
+- Handles **casual conversation & greetings** (*"Hello!", "Who are you?"*) warmly and concisely.
+- Accurately retrieves **product specifications & pricing** from ChromaDB.
+- Remembers **multi-turn context** (e.g., follow-up questions like *"How much does it cost?"*).
+- Type `exit` to quit.
+
+## Notes on OpenRouter Free Tier
+Free tier accounts on OpenRouter have a limit of 50 requests per day (resetting daily at 00:00 UTC). Each query uses 2 requests (1 for embedding + 1 for LLM generation).
