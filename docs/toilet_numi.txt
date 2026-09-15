@@ -1,8 +1,0 @@
-Product: Kohler Numi 2.0 Smart Toilet
-Category: Smart Toilet
-Price: $7,200
-Style: Modern Luxury
-Dimensions: 29 in length x 16.5 in width x 22.5 in height
-Features: Heated seat, ambient lighting, Bluetooth audio, auto open/close lid, integrated bidet with adjustable warm water wash, foot-activated flush
-Power: Requires nearby GFCI outlet
-Description: Fully integrated smart toilet with a sculptural, tankless silhouette. Best suited for larger primary bathrooms due to footprint and power requirements.

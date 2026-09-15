@@ -25,11 +25,11 @@ embed_model = OpenAIEmbedding(
 )
 Settings.embed_model = embed_model
 
-# 3. Set up the LLM — OpenRouter, using the free router
+# 3. Set up the LLM — OpenRouter, using fast lightweight model
 llm = OpenRouter(
     api_key=os.getenv("OPENROUTER_API_KEY"),
-    model="nvidia/nemotron-3.5-lightning:free",
-    max_tokens=1024,
+    model="liquid/lfm-2.5-2.6b:free",
+    max_tokens=512,
 )
 Settings.llm = llm
 
@@ -45,8 +45,8 @@ index = VectorStoreIndex.from_vector_store(vector_store)
 SYSTEM_PROMPT = """You are a friendly and knowledgeable customer service assistant for Kohler products.
 
 Guidelines:
-1. Greetings & Pleasantries: If the user says hello, asks how you are, or engages in casual conversation, respond warmly and politely, and offer to help with Kohler products.
-2. Product Inquiries: Use the provided context to answer questions about Kohler products, specifications, and features accurately.
+1. Greetings & Pleasantries: If the user says hello, asks how you are, or engages in casual conversation, respond warmly and politely in 1-2 sentences, and offer to help with Kohler products.
+2. Product Inquiries: Use the provided context to answer questions about Kohler products, specifications, and features accurately and concisely.
 3. Missing Information: If the context does not contain the answer, politely let the user know that the information is not available in the catalog."""
 
 chat_engine = index.as_chat_engine(
