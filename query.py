@@ -41,12 +41,23 @@ vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
 # 5. Load the index FROM the existing vector store
 index = VectorStoreIndex.from_vector_store(vector_store)
 
-# 6. Turn the index into a query engine
-query_engine = index.as_query_engine(similarity_top_k=3)
+# 6. Turn the index into a chat engine with conversation memory and system prompt
+SYSTEM_PROMPT = """You are a friendly and knowledgeable customer service assistant for Kohler products.
 
-# 7. Ask questions in a loop
+Guidelines:
+1. Greetings & Pleasantries: If the user says hello, asks how you are, or engages in casual conversation, respond warmly and politely, and offer to help with Kohler products.
+2. Product Inquiries: Use the provided context to answer questions about Kohler products, specifications, and features accurately.
+3. Missing Information: If the context does not contain the answer, politely let the user know that the information is not available in the catalog."""
+
+chat_engine = index.as_chat_engine(
+    chat_mode="context",
+    similarity_top_k=3,
+    system_prompt=SYSTEM_PROMPT,
+)
+
+# 7. Chat in an interactive loop
 if __name__ == "__main__":
-    print("Ask a question about the Kohler product catalog (type 'exit' to quit)")
+    print("Chat with the Kohler product assistant (type 'exit' to quit)")
     while True:
         try:
             question = input("\nYou: ")
@@ -57,5 +68,5 @@ if __name__ == "__main__":
             continue
         if question.strip().lower() == "exit":
             break
-        response = query_engine.query(question)
+        response = chat_engine.chat(question)
         print("\nAssistant:", response)
