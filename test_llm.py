@@ -8,7 +8,7 @@ load_dotenv()
 # 2. Set up the OpenRouter LLM
 llm = OpenRouter(
     api_key=os.getenv("OPENROUTER_API_KEY"),
-    model="openrouter/free",
+    model="nvidia/nemotron-3.5-lightning:free",
     max_tokens=1024,  # prevents empty responses from reasoning models
 )
 

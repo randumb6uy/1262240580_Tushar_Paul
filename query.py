@@ -1,3 +1,4 @@
+import asyncio
 import os
 import sys
 from dotenv import load_dotenv
@@ -8,65 +9,51 @@ if sys.stdout.encoding != "utf-8":
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
-from llama_index.core import VectorStoreIndex, Settings
-from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.vector_stores.chroma import ChromaVectorStore
-from llama_index.llms.openrouter import OpenRouter
-import chromadb
 
-# 1. Load environment variables (this is where the API key comes from)
+from agent import create_agent, smart_process_query
+from llama_index.core.workflow import Context
+
 load_dotenv()
 
-# 2. Set up the embedding model — OpenRouter Embeddings API (matches ingest.py)
-embed_model = OpenAIEmbedding(
-    model_name="nvidia/nemotron-3-embed-1b:free",
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    api_base="https://openrouter.ai/api/v1",
-)
-Settings.embed_model = embed_model
+async def main():
+    print("=========================================================")
+    print(" [KOHLER] Autonomous Shopping & Specs Agent (Zero API Cost)")
+    print(" Equipped with Fast-Path Router, In-Memory Cache & Tools")
+    print(" Type 'exit' to quit.")
+    print("=========================================================\n")
+    
+    agent = create_agent()
+    ctx = Context(agent)  # Persistent conversation memory across multi-turn interactions
 
-# 3. Set up the LLM — OpenRouter, using fast lightweight model
-llm = OpenRouter(
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    model="liquid/lfm-2.5-2.6b:free",
-    max_tokens=512,
-)
-Settings.llm = llm
-
-# 4. Reconnect to the existing ChromaDB collection (no re-embedding needed)
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
-chroma_collection = chroma_client.get_or_create_collection("kohler_products")
-vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
-
-# 5. Load the index FROM the existing vector store
-index = VectorStoreIndex.from_vector_store(vector_store)
-
-# 6. Turn the index into a chat engine with conversation memory and system prompt
-SYSTEM_PROMPT = """You are a friendly and knowledgeable customer service assistant for Kohler products.
-
-Guidelines:
-1. Greetings & Pleasantries: If the user says hello, asks how you are, or engages in casual conversation, respond warmly and politely in 1-2 sentences, and offer to help with Kohler products.
-2. Product Inquiries: Use the provided context to answer questions about Kohler products, specifications, and features accurately and concisely.
-3. Missing Information: If the context does not contain the answer, politely let the user know that the information is not available in the catalog."""
-
-chat_engine = index.as_chat_engine(
-    chat_mode="context",
-    similarity_top_k=3,
-    system_prompt=SYSTEM_PROMPT,
-)
-
-# 7. Chat in an interactive loop
-if __name__ == "__main__":
-    print("Chat with the Kohler product assistant (type 'exit' to quit)")
     while True:
         try:
             question = input("\nYou: ")
         except (KeyboardInterrupt, EOFError):
             print("\nGoodbye!")
             break
+            
         if not question.strip():
             continue
-        if question.strip().lower() == "exit":
+        if question.strip().lower() in ["exit", "quit", "q"]:
+            print("Goodbye!")
             break
-        response = chat_engine.chat(question)
-        print("\nAssistant:", response)
+
+        final_response = ""
+        async for update in smart_process_query(agent, question, ctx=ctx):
+            u_type = update.get("type")
+            if u_type == "route":
+                print(f"\n[Route] {update['badge']}")
+            elif u_type == "activity":
+                print(f"  -> {update['msg']}")
+            elif u_type == "tool_call":
+                args = f"({update['args']})" if update.get("args") else ""
+                print(f"  -> [Tool Call] {update['name']}{args}")
+            elif u_type == "tool_result":
+                print(f"  <- [Tool Output] {update['output']}...")
+            elif u_type == "final":
+                final_response = update["content"]
+
+        print(f"\nAssistant:\n{final_response}\n")
+
+if __name__ == "__main__":
+    asyncio.run(main())
