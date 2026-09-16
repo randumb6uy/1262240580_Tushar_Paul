@@ -69,13 +69,17 @@ async def chat_handler(message: str, history: list, session_ctx: dict):
 
     yield final_text
 
-# 4. Gradio Blocks Interface
-with gr.Blocks(title="Kohler Autonomous AI Agent") as demo:
+# 4. Clean & Compact Customer UI
+CUSTOM_CSS = """
+.gradio-container { max-width: 900px !important; margin: 0 auto !important; }
+footer { display: none !important; }
+"""
+
+with gr.Blocks(title="Kohler Concierge") as demo:
     gr.Markdown(
         """
-        # 🛁 Kohler Autonomous Shopping & Specs Agent (INR Edition)
-        **High-Speed RAG + Smart Fast-Path Router + Autonomous Multi-Tool Calling**  
-        *All prices natively quoted in Indian Rupees (₹ INR at 1 USD = ₹83.50). Equipped with In-Memory LRU Cache, Local BGE Embeddings, Cross-Encoder Reranker, Price Calculator, and Stock Checker.*
+        ### 🛁 Kohler Design & Purchasing Concierge
+        *Your personal assistant for Kohler luxury bathroom products, specifications, custom bundle quotes, and availability in India (₹ INR).*
         """
     )
     
@@ -84,12 +88,14 @@ with gr.Blocks(title="Kohler Autonomous AI Agent") as demo:
     chat_interface = gr.ChatInterface(
         fn=chat_handler,
         additional_inputs=[session_state],
+        chatbot=gr.Chatbot(height=480, render_markdown=True),
+        textbox=gr.Textbox(placeholder="Ask about Kohler products, finishes, dimensions, bundle quotes, or stock...", container=False, scale=7),
         examples=[
-            ["What is the price in INR and finishes for the Purist faucet?"],
-            ["What is the price of the Purist faucet, and what would it cost with a 15% discount and 18% GST?"],
-            ["Do you have the Veil smart toilet in stock, and how long will shipping take to ZIP 90210?"],
-            ["Can you give me an itemized quote in INR for the Moxie showerhead and Poplin vanity?"],
-            ["Hello! What kind of products do you specialize in?"],
+            ["What finishes and dimensions are available for the Purist faucet?"],
+            ["Tell me about the Numi 2.0 smart toilet and its luxury features."],
+            ["What would the Moxie Bluetooth showerhead cost with a 15% discount and 18% GST?"],
+            ["Do you have the Veil intelligent toilet in stock for delivery?"],
+            ["Can you recommend a matching faucet and vanity package for a modern bathroom?"],
         ],
     )
 
@@ -107,5 +113,6 @@ if __name__ == "__main__":
         server_name="0.0.0.0",
         server_port=args.port,
         share=share_flag,
-        theme=gr.themes.Soft(),
+        theme=gr.themes.Soft(spacing_size="sm", text_size="sm"),
+        css=CUSTOM_CSS,
     )
