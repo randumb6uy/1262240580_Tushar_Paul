@@ -31,9 +31,7 @@ def load_jsonl_documents(jsonl_path: str = "docs/products.jsonl") -> list[Docume
     Creates discrete per-product Document nodes with structured metadata.
     """
     if not os.path.exists(jsonl_path):
-        from convert_to_jsonl import convert
-        print(f"[Ingest] '{jsonl_path}' not found. Auto-generating from docs/*.txt...")
-        convert()
+        raise FileNotFoundError(f"[Ingest Error] Catalog file '{jsonl_path}' not found.")
 
     documents = []
     with open(jsonl_path, "r", encoding="utf-8") as f:

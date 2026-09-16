@@ -160,15 +160,13 @@ RAG-Project/
 ├── agent.py                 # Autonomous AgentWorkflow & smart query dispatcher
 ├── router.py                # Deterministic intent classifier (0ms overhead)
 ├── ingest.py                # ChromaDB vector index builder with local BGE
-├── convert_to_jsonl.py      # Catalog parser with ₹xx,999 psychological pricing
 ├── test_suite.py            # Comprehensive 7-test empirical benchmark runner
 ├── run_demo.bat             # 1-click Windows setup and launch script
 ├── run_demo.sh              # 1-click Linux/macOS setup and launch script
 ├── requirements.txt         # Pinned Python package dependencies
 ├── .env.example             # Environment configuration template
 ├── docs/
-│   ├── products.jsonl       # High-speed compact atomic product catalog
-│   └── *.txt                # Original category reference files
+│   └── products.jsonl       # High-speed compact atomic product catalog
 └── tools/
     ├── catalog.py           # Cached ChromaDB + Cross-Encoder retrieval tool
     ├── calculator.py        # Itemized package & GST calculator tool
