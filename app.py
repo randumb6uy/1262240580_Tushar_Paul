@@ -870,21 +870,86 @@ def get_default_views() -> Tuple[str, str, str, str]:
 
 
 # ==============================================================================
-# 6. LLM CALL WRAPPER (LOCAL OLLAMA QWEN2.5 WITH DETERMINISTIC FALLBACK)
+# 6. LLM CALL WRAPPER (AUTO-DETECTING MODELFILE & PORTABLE FALLBACK)
 # ==============================================================================
+
+_RESOLVED_MODEL = None
+
+def get_active_model() -> str:
+    """
+    Automatically detects and selects the best available Ollama model.
+    1. If 'kohler-concierge' exists, uses it.
+    2. If not, attempts to auto-register it using the local Modelfile via Ollama API.
+    3. Falls back seamlessly to 'qwen2.5:3b' or any available model in Ollama.
+    Ensures 100% portability across different machines and environments with zero manual setup.
+    """
+    global _RESOLVED_MODEL
+    if _RESOLVED_MODEL:
+        return _RESOLVED_MODEL
+
+    try:
+        req = urllib.request.Request("http://localhost:11434/api/tags")
+        with urllib.request.urlopen(req, timeout=1.5) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            installed_models = [m.get("name", "") for m in data.get("models", [])]
+
+            # 1. Check if kohler-concierge is already registered
+            for m in installed_models:
+                if "kohler-concierge" in m:
+                    _RESOLVED_MODEL = "kohler-concierge"
+                    return _RESOLVED_MODEL
+
+            # 2. Auto-register kohler-concierge via Ollama API if Modelfile exists
+            modelfile_path = os.path.join(os.path.dirname(__file__), "Modelfile")
+            if os.path.exists(modelfile_path):
+                with open(modelfile_path, "r", encoding="utf-8") as f:
+                    modelfile_content = f.read()
+                create_payload = json.dumps({
+                    "name": "kohler-concierge",
+                    "modelfile": modelfile_content,
+                    "stream": False
+                }).encode("utf-8")
+                c_req = urllib.request.Request(
+                    "http://localhost:11434/api/create",
+                    data=create_payload,
+                    headers={"Content-Type": "application/json"}
+                )
+                with urllib.request.urlopen(c_req, timeout=15.0) as c_resp:
+                    if c_resp.status == 200:
+                        _RESOLVED_MODEL = "kohler-concierge"
+                        print("[Ollama] Automatically registered 'kohler-concierge' from Modelfile.")
+                        return _RESOLVED_MODEL
+
+            # 3. Portable fallbacks to standard models
+            for candidate in ["qwen2.5:3b", "llama3.1:8b"]:
+                for m in installed_models:
+                    if candidate in m:
+                        _RESOLVED_MODEL = candidate
+                        return _RESOLVED_MODEL
+
+            if installed_models:
+                _RESOLVED_MODEL = installed_models[0].split(":")[0]
+                return _RESOLVED_MODEL
+    except Exception:
+        pass
+
+    _RESOLVED_MODEL = "qwen2.5:3b"
+    return _RESOLVED_MODEL
+
 
 def call_llm(system_prompt: str, user_prompt: str) -> str:
     """
-    Calls local Ollama daemon (qwen2.5:3b) with low latency.
-    Falls back gracefully to a deterministic response if Ollama is unavailable.
+    Calls local Ollama daemon with the active model and low latency.
+    Falls back gracefully to deterministic logic if Ollama is unavailable.
     """
+    model_name = get_active_model()
     try:
         url = "http://localhost:11434/api/generate"
         payload = json.dumps({
-            "model": "qwen2.5:3b",
+            "model": model_name,
             "prompt": f"{system_prompt}\n\nUser: {user_prompt}\nAssistant:",
             "stream": False,
-            "options": {"temperature": 0.3, "num_predict": 400}
+            "options": {"temperature": 0.2, "num_predict": 400}
         }).encode("utf-8")
         req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=3.5) as response:
