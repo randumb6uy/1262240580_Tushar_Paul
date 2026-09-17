@@ -28,6 +28,14 @@ AESTHETIC_PATTERNS = [
     r"\bbought together\b",
 ]
 
+SPATIAL_PATTERNS = [
+    r"\b\d+\s*x\s*\d+\b", r"\b\d+\s*by\s*\d+\b", r"\b\d+\s*ft\b",
+    r"\bsq\s*ft\b", r"\bsquare\s*feet\b", r"\bdimension\b", r"\bdimensions\b",
+    r"\blayout\b", r"\bfloor\s*plan\b", r"\bblueprint\b", r"\bfit in\b",
+    r"\bphysical space\b", r"\bpowder room\b", r"\b2d\b", r"\b3d\b",
+    r"\bclearance\b", r"\broom size\b"
+]
+
 GREETING_PATTERNS = [
     r"\b(hello|hi|hey|heyy|heyyy|hiya|howdy|greetings|good morning|good afternoon|good evening)\b",
     r"\b(yo|ye|wassup|whatsup|what's up|whats up|wazzup|sup|what's good|whats good)\b",
@@ -47,12 +55,13 @@ def classify_query(query: str) -> QueryRoute:
         if re.search(pattern, clean_q):
             return QueryRoute.GREETING
 
-    # 2. Complex Agentic Path (Calculator, Inventory, or Aesthetic Matcher tools required)
+    # 2. Complex Agentic Path (Calculator, Inventory, Aesthetic Matcher, or Space Optimizer required)
     has_math = any(re.search(p, clean_q) for p in MATH_PATTERNS)
     has_inventory = any(re.search(p, clean_q) for p in INVENTORY_PATTERNS)
     has_aesthetic = any(re.search(p, clean_q) for p in AESTHETIC_PATTERNS)
+    has_spatial = any(re.search(p, clean_q) for p in SPATIAL_PATTERNS)
     
-    if has_math or has_inventory or has_aesthetic:
+    if has_math or has_inventory or has_aesthetic or has_spatial:
         return QueryRoute.AGENTIC
 
     # 3. Fast-Path RAG (Standard product specifications, features, finishes, dimensions, single-item prices)

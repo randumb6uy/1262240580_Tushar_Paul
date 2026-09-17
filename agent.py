@@ -37,12 +37,15 @@ You have access to the following tools:
 1. kohler_catalog_search: Search product specifications, dimensions, finishes, and catalog prices (in ₹ INR). Input should be a simple search query string (e.g. "Moxie showerhead" or "Purist faucet").
 2. price_and_package_calculator: Calculate bundle totals, volume discounts, and taxes in ₹ INR. Input should be item_prices (list of numbers like [15999.0]), optional discount_percent, and optional tax_percent.
 3. inventory_and_delivery_checker: Check live warehouse stock status and shipping transit times. Provide product_model_or_name and optional zip_code.
-4. aesthetic_combo_recommender: Recommends aesthetically matched fixtures (coordinating metal finishes, complementary styles, and harmonious collections) and calculates promotional package combo discounts (10% to 18% off) in ₹ INR. Input should be query_product_or_style (e.g. "Purist faucet" or "zen spa") and optional target_category (e.g. "vanity" or "shower").
+4. aesthetic_combo_recommender: Recommends aesthetically matched fixtures (coordinating metal finishes, complementary styles, and harmonious collections) and calculates promotional package combo discounts (10% to 22% off) in ₹ INR. Input should be query_product_or_style (e.g. "Purist faucet" or "zen spa") and optional target_category (e.g. "vanity" or "shower").
+5. space_and_budget_optimizer: Fits bathroom combinations to exact room dimensions (length & width in feet) and budget ceilings in ₹ INR. Enforces building clearances, applies bundle discounts, and generates a Dual-View 2D architectural blueprint and interactive 3D WebGL room model. Input: room_length_ft, room_width_ft, max_budget_inr, optional style_preference, and optional must_have_categories.
 
 Operational Guidelines:
 - When the user asks about Kohler products, use 'kohler_catalog_search' to verify the exact details before answering. Always state prices clearly in Indian Rupees (₹ INR).
 - When the user asks for quotes, packages, multiple items, or discounts, retrieve the prices first, then call 'price_and_package_calculator' for exact math.
 - When the user asks what goes with a product, wants a matching aesthetic/finish, asks for bathroom combination packages, or wants style coordination, call 'aesthetic_combo_recommender' to present the matched suite and combo savings.
+- When the user mentions room dimensions (e.g. '8x6', '10 by 7 ft', 'powder room space') or specifies a budget ceiling for a room layout, call 'space_and_budget_optimizer' to calculate the layout and Dual-View 2D/3D visualizer.
+- When presenting 'space_and_budget_optimizer' results, DO NOT critique or explain the code. Deliver your consultative sales quote: present the recommended fixtures, confirm code clearances and budget fit, explain the combo savings in ₹ INR, and include the visualizer block.
 - When the user asks about delivery or stock, use 'inventory_and_delivery_checker'.
 - SPEED INSTRUCTION: Do NOT output your internal thinking scratchpad (no 'Here is my thought process'). Be direct, concise, and professional.
 """
@@ -172,7 +175,18 @@ async def smart_process_query(agent: AgentWorkflow, user_msg: str, ctx: Context 
                 yield {"type": "tool_result", "output": out}
 
         final_response = await handler
-        yield {"type": "final", "content": str(final_response)}
+        final_text = str(final_response)
+
+        try:
+            from tools.space_optimizer import get_latest_visual_layout, clear_latest_visual_layout
+            layout_ui = get_latest_visual_layout()
+            if layout_ui:
+                final_text = final_text.strip() + "\n\n" + layout_ui
+                clear_latest_visual_layout()
+        except Exception:
+            pass
+
+        yield {"type": "final", "content": final_text}
 
 if __name__ == "__main__":
     import asyncio
