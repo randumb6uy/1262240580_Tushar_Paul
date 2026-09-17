@@ -46,28 +46,28 @@ def _generate_2d_svg(
     room_type: str,
     finish_color: str = "#222222"
 ) -> str:
-    """Generates an architectural 2D top-down SVG blueprint with dimension lines and clearances."""
+    """Generates an architectural 2D top-down SVG blueprint with dimension lines and clearances in Blue & Black styling."""
     # Scale: 50 pixels per foot
     scale = 50.0
     svg_w = int(room_w_ft * scale)
     svg_h = int(room_l_ft * scale)
-    padding = 60
+    padding = 65
     total_w = svg_w + (padding * 2)
     total_h = svg_h + (padding * 2)
 
     svg_parts = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {total_w} {total_h}" width="100%" height="{min(total_h, 450)}" style="background:#0e1117; font-family:monospace; border-radius:8px; border:1px solid #30363d;">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {total_w} {total_h}" width="100%" height="{min(total_h, 460)}" style="background:#070c18; font-family:monospace; border-radius:8px; border:1px solid #1e3a8a; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);">',
         f'<defs>',
-        f'  <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">',
-        f'    <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#21262d" stroke-width="0.8"/>',
+        f'  <pattern id="cadgrid" width="25" height="25" patternUnits="userSpaceOnUse">',
+        f'    <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#131e33" stroke-width="0.8"/>',
         f'  </pattern>',
         f'</defs>',
         # Grid background
-        f'<rect x="{padding}" y="{padding}" width="{svg_w}" height="{svg_h}" fill="url(#grid)" stroke="#58a6ff" stroke-width="2.5"/>',
+        f'<rect x="{padding}" y="{padding}" width="{svg_w}" height="{svg_h}" fill="url(#cadgrid)" stroke="#2563eb" stroke-width="2.5"/>',
         # Dimension callouts
-        f'<text x="{padding + svg_w/2}" y="{padding - 15}" fill="#8b949e" font-size="12" text-anchor="middle">← {room_w_ft:.1f} ft ({int(room_w_ft*12)}\") →</text>',
-        f'<text x="{padding - 15}" y="{padding + svg_h/2}" fill="#8b949e" font-size="12" text-anchor="middle" transform="rotate(-90 {padding - 15} {padding + svg_h/2})">← {room_l_ft:.1f} ft ({int(room_l_ft*12)}\") →</text>',
-        f'<text x="{padding + 10}" y="{padding + 22}" fill="#58a6ff" font-size="11" font-weight="bold">KOHLER ARCHITECTURAL LAYOUT | {room_type.upper()}</text>',
+        f'<text x="{padding + svg_w/2}" y="{padding - 18}" fill="#60a5fa" font-size="12" font-weight="bold" text-anchor="middle">← {room_w_ft:.1f} ft ({int(room_w_ft*12)}\") →</text>',
+        f'<text x="{padding - 18}" y="{padding + svg_h/2}" fill="#60a5fa" font-size="12" font-weight="bold" text-anchor="middle" transform="rotate(-90 {padding - 18} {padding + svg_h/2})">← {room_l_ft:.1f} ft ({int(room_l_ft*12)}\") →</text>',
+        f'<text x="{padding + 12}" y="{padding + 22}" fill="#38bdf8" font-size="11" font-weight="bold" letter-spacing="1">KOHLER CAD BLUEPRINT | {room_type.upper()}</text>',
     ]
 
     # Door swing arc (Standard bottom-left door)
@@ -75,9 +75,9 @@ def _generate_2d_svg(
     door_x = padding
     door_y = padding + svg_h
     svg_parts.append(
-        f'<path d="M {door_x} {door_y - door_w} A {door_w} {door_w} 0 0 1 {door_x + door_w} {door_y}" fill="none" stroke="#e3b341" stroke-dasharray="4,4" stroke-width="1.5"/>'
-        f'<line x1="{door_x}" y1="{door_y}" x2="{door_x}" y2="{door_y - door_w}" stroke="#e3b341" stroke-width="2.5"/>'
-        f'<text x="{door_x + 8}" y="{door_y - 8}" fill="#e3b341" font-size="10">DOOR (30")</text>'
+        f'<path d="M {door_x} {door_y - door_w} A {door_w} {door_w} 0 0 1 {door_x + door_w} {door_y}" fill="none" stroke="#eab308" stroke-dasharray="4,4" stroke-width="1.5"/>'
+        f'<line x1="{door_x}" y1="{door_y}" x2="{door_x}" y2="{door_y - door_w}" stroke="#eab308" stroke-width="2.5"/>'
+        f'<text x="{door_x + 8}" y="{door_y - 8}" fill="#eab308" font-size="10" font-weight="bold">DOOR SWING (30")</text>'
     )
 
     # Render Fixtures
@@ -89,48 +89,48 @@ def _generate_2d_svg(
         label = item["label"]
         cat = item.get("category", "")
 
-        # Clearance Zone (Dashed boundary)
+        # Clearance Zone (Dashed boundary in Cyan)
         cx = max(padding, ix - 6)
         cy = max(padding, iy - 6)
         cw = iw + 12
         ch = ih + 12
         svg_parts.append(
-            f'<rect x="{cx}" y="{cy}" width="{cw}" height="{ch}" fill="none" stroke="#238636" stroke-dasharray="3,3" stroke-width="1"/>'
+            f'<rect x="{cx}" y="{cy}" width="{cw}" height="{ch}" fill="none" stroke="#0284c7" stroke-dasharray="3,3" stroke-width="1"/>'
         )
 
         # Fixture Body
         if cat == "toilets":
             # Oval bowl + tank
             svg_parts.append(
-                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{int(ih*0.35)}" rx="3" fill="#30363d" stroke="{finish_color}" stroke-width="2"/>'
-                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih*0.65}" rx="{iw*0.45}" ry="{ih*0.35}" fill="#21262d" stroke="{finish_color}" stroke-width="2"/>'
+                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{int(ih*0.35)}" rx="3" fill="#0f172a" stroke="{finish_color}" stroke-width="2"/>'
+                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih*0.65}" rx="{iw*0.45}" ry="{ih*0.35}" fill="#1e293b" stroke="{finish_color}" stroke-width="2"/>'
             )
         elif cat in ["showers", "tubs_and_sinks"] and "shower" in label.lower():
             # Glass partition + drain
             svg_parts.append(
-                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" fill="#1f6feb22" stroke="#388bfd" stroke-width="2"/>'
-                f'<circle cx="{ix + iw/2}" cy="{iy + ih/2}" r="6" fill="#30363d" stroke="#58a6ff" stroke-width="1.5"/>'
-                f'<line x1="{ix}" y1="{iy}" x2="{ix+iw}" y2="{iy+ih}" stroke="#1f6feb55" stroke-width="1"/>'
-                f'<line x1="{ix}" y1="{iy+ih}" x2="{ix+iw}" y2="{iy}" stroke="#1f6feb55" stroke-width="1"/>'
+                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" fill="#0284c718" stroke="#38bdf8" stroke-width="2"/>'
+                f'<circle cx="{ix + iw/2}" cy="{iy + ih/2}" r="6" fill="#0f172a" stroke="#60a5fa" stroke-width="1.5"/>'
+                f'<line x1="{ix}" y1="{iy}" x2="{ix+iw}" y2="{iy+ih}" stroke="#0284c744" stroke-width="1"/>'
+                f'<line x1="{ix}" y1="{iy+ih}" x2="{ix+iw}" y2="{iy}" stroke="#0284c744" stroke-width="1"/>'
             )
         elif "tub" in label.lower():
             # Oval tub
             svg_parts.append(
-                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="12" fill="#21262d" stroke="{finish_color}" stroke-width="2"/>'
-                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih/2}" rx="{iw*0.42}" ry="{ih*0.38}" fill="#161b22" stroke="#8b949e" stroke-width="1.2"/>'
-                f'<circle cx="{ix + iw*0.25}" cy="{iy + ih/2}" r="4" fill="#58a6ff"/>'
+                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="12" fill="#0f172a" stroke="{finish_color}" stroke-width="2"/>'
+                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih/2}" rx="{iw*0.42}" ry="{ih*0.38}" fill="#161f38" stroke="#38bdf8" stroke-width="1.2"/>'
+                f'<circle cx="{ix + iw*0.25}" cy="{iy + ih/2}" r="4" fill="#60a5fa"/>'
             )
         else:
             # Vanity cabinet + undermount basin
             svg_parts.append(
-                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="4" fill="#21262d" stroke="{finish_color}" stroke-width="2"/>'
-                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih/2}" rx="{min(iw*0.35, 18)}" ry="{min(ih*0.35, 12)}" fill="#161b22" stroke="#8b949e" stroke-width="1.2"/>'
+                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="4" fill="#0f172a" stroke="{finish_color}" stroke-width="2"/>'
+                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih/2}" rx="{min(iw*0.35, 18)}" ry="{min(ih*0.35, 12)}" fill="#161f38" stroke="#38bdf8" stroke-width="1.2"/>'
                 f'<circle cx="{ix + iw/2}" cy="{iy + ih*0.25}" r="3" fill="{finish_color}"/>'
             )
 
         # Text Tag
         svg_parts.append(
-            f'<text x="{ix + iw/2}" y="{iy + ih + 14}" fill="#f0f6fc" font-size="10" font-weight="bold" text-anchor="middle">{label}</text>'
+            f'<text x="{ix + iw/2}" y="{iy + ih + 14}" fill="#f8fafc" font-size="10" font-weight="bold" text-anchor="middle">{label}</text>'
         )
 
     svg_parts.append('</svg>')
@@ -175,18 +175,20 @@ def _generate_3d_threejs_html(
 <head>
   <meta charset="utf-8">
   <style>
-    body {{ margin: 0; padding: 0; overflow: hidden; background: #0b0f19; font-family: sans-serif; }}
-    #canvas-container {{ width: 100%; height: 420px; position: relative; }}
+    body {{ margin: 0; padding: 0; overflow: hidden; background: #060913; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }}
+    #canvas-container {{ width: 100%; height: 470px; position: relative; }}
     .badge {{
       position: absolute; top: 12px; left: 14px;
-      background: rgba(15, 23, 42, 0.85); color: #38bdf8;
-      padding: 6px 12px; border-radius: 6px; font-size: 11px;
-      font-weight: 600; border: 1px solid #1e293b; pointer-events: none;
+      background: rgba(11, 17, 32, 0.92); color: #38bdf8;
+      padding: 6px 14px; border-radius: 6px; font-size: 11px;
+      font-weight: 700; border: 1px solid #1e3a8a; pointer-events: none;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
     }}
     .tip {{
       position: absolute; bottom: 12px; right: 14px;
-      background: rgba(15, 23, 42, 0.85); color: #94a3b8;
-      padding: 4px 10px; border-radius: 6px; font-size: 10px; pointer-events: none;
+      background: rgba(11, 17, 32, 0.92); color: #94a3b8;
+      padding: 5px 12px; border-radius: 6px; font-size: 11px; pointer-events: none;
+      border: 1px solid #1e293b;
     }}
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -194,21 +196,21 @@ def _generate_3d_threejs_html(
 </head>
 <body>
   <div id="canvas-container">
-    <div class="badge">🧊 3D ISOMETRIC PREVIEW | {room_type.upper()} ({room_w_ft:.1f}' x {room_l_ft:.1f}')</div>
-    <div class="tip">Left-Click: Orbit/Rotate | Right-Click: Pan | Scroll: Zoom</div>
+    <div class="badge">🧊 3D ISOMETRIC ROOM | {room_type.upper()} ({room_w_ft:.1f}' × {room_l_ft:.1f}')</div>
+    <div class="tip">🖱️ Left-Click: 360° Orbit | Right-Click: Pan | Scroll: Zoom</div>
   </div>
   <script>
     const container = document.getElementById('canvas-container');
     const width = container.clientWidth || 600;
-    const height = 420;
+    const height = 470;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0b0f19);
+    scene.background = new THREE.Color(0x060913);
 
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
     camera.position.set({room_w_ft * 1.5}, {room_l_ft * 1.8}, {room_w_ft * 2.2});
 
-    const renderer = new THREE.WebGLRenderer({{ antialias: true }});
+    const renderer = new THREE.WebGLRenderer({{ antialias: true, alpha: true }});
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
     container.appendChild(renderer.domElement);
@@ -220,7 +222,7 @@ def _generate_3d_threejs_html(
     controls.target.set({room_w_ft/2}, 1, {room_l_ft/2});
 
     // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
     scene.add(ambientLight);
     const dirLight = new THREE.DirectionalLight(0xfffaed, 0.9);
     dirLight.position.set(10, 20, 15);
@@ -555,7 +557,7 @@ def optimize_space_and_budget(
         })
 
     # Generate 2D SVG Blueprint
-    svg_2d = _generate_2d_svg(r_w, r_l, layout_items, room_type, "#e3b341" if "brass" in focal_finish.lower() else "#f0f6fc")
+    svg_2d = _generate_2d_svg(r_w, r_l, layout_items, room_type, "#eab308" if "brass" in focal_finish.lower() else "#38bdf8")
     # Generate 3D HTML
     threejs_html = _generate_3d_threejs_html(r_w, r_l, layout_items, room_type, focal_finish)
 
@@ -563,21 +565,145 @@ def optimize_space_and_budget(
     import base64
     b64_3d = base64.b64encode(threejs_html.encode("utf-8")).decode("ascii")
 
+    surplus_or_deficit = budget - grand_total
+    status_badge_text = f"✅ Fits Budget (Surplus: ₹{surplus_or_deficit:,.2f} INR)" if surplus_or_deficit >= 0 else f"⚠️ Exceeds Budget by ₹{-surplus_or_deficit:,.2f} INR"
+    status_badge_color = "#34d399" if surplus_or_deficit >= 0 else "#f87171"
+    status_badge_border = "#059669" if surplus_or_deficit >= 0 else "#dc2626"
+
+    # Generate Spec Table HTML for Tab 3
+    spec_rows = []
+    for idx, p in enumerate(selected_products, 1):
+        price = float(p.get("price", 0))
+        dim = p.get("dimensions", "Standard")
+        finish = p.get("finish", "Standard")
+        spec_rows.append(f"""
+        <tr style="border-bottom:1px solid #1e293b;">
+          <td style="padding:10px; color:#f8fafc; font-weight:600;">{idx}. {p['name']}</td>
+          <td style="padding:10px; color:#94a3b8;">{p.get('category', '').title()}</td>
+          <td style="padding:10px; color:#cbd5e1; font-family:monospace; font-size:11px;">{dim}</td>
+          <td style="padding:10px; color:#38bdf8;">{finish}</td>
+          <td style="padding:10px; text-align:right; color:#f8fafc; font-weight:700;">₹{price:,.2f}</td>
+        </tr>
+        """)
+    spec_rows_html = "".join(spec_rows)
+
+    spec_table_html = f"""
+    <div style="background:#0a0f1d; border-radius:8px; padding:14px; border:1px solid #1e293b; color:#f8fafc;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+        <span style="font-size:13px; font-weight:700; color:#38bdf8;">📋 Itemized Fixture Specifications</span>
+        <span style="background:#0f172a; border:1px solid {status_badge_border}; color:{status_badge_color}; font-size:11px; font-weight:600; padding:3px 10px; border-radius:12px;">{status_badge_text}</span>
+      </div>
+      <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:14px;">
+        <thead>
+          <tr style="background:#0f172a; color:#94a3b8; text-align:left; border-bottom:1px solid #1e3a8a;">
+            <th style="padding:8px 10px;">Fixture</th>
+            <th style="padding:8px 10px;">Category</th>
+            <th style="padding:8px 10px;">Dimensions</th>
+            <th style="padding:8px 10px;">Finish</th>
+            <th style="padding:8px 10px; text-align:right;">Catalog Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {spec_rows_html}
+        </tbody>
+      </table>
+
+      <!-- Combo Savings Breakdown -->
+      <div style="background:#0f172a; border-radius:8px; padding:12px; border:1px solid #1e3a8a; font-size:12px; margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#94a3b8;">
+          <span>Combined Catalog Subtotal ({n_items} items):</span>
+          <span style="color:#f8fafc; font-weight:600;">₹{subtotal:,.2f} INR</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#38bdf8;">
+          <span>Promotional Deal ({tier_label}):</span>
+          <span style="font-weight:700;">-₹{discount_val:,.2f} INR ({disc_pct}% off)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#94a3b8;">
+          <span>Subtotal after Savings:</span>
+          <span style="color:#f8fafc; font-weight:600;">₹{taxable:,.2f} INR</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#94a3b8;">
+          <span>Estimated GST (18%):</span>
+          <span style="color:#f8fafc; font-weight:600;">+₹{gst:,.2f} INR</span>
+        </div>
+        <div style="border-top:1px solid #1e293b; margin-top:8px; padding-top:8px; display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
+          <span style="color:#60a5fa;">Final Grand Package Total:</span>
+          <span style="color:#38bdf8;">₹{grand_total:,.2f} INR</span>
+        </div>
+      </div>
+
+      <!-- Building Clearance Verification Checklist -->
+      <div style="background:#060913; border-radius:8px; padding:12px; border:1px solid #1e293b; font-size:11px;">
+        <div style="color:#38bdf8; font-weight:700; margin-bottom:6px;">Building Code & Architectural Clearances Verified:</div>
+        <div style="color:#34d399; margin-bottom:4px;">✓ <b>15" Sanitary Centerline:</b> Toilet centerline placed with ≥ 15" clearance from sidewall and vanity.</div>
+        <div style="color:#34d399; margin-bottom:4px;">✓ <b>21" Front Clearance:</b> Clear frontal floor area verified for all plumbing fixtures.</div>
+        <div style="color:#34d399; margin-bottom:4px;">✓ <b>30" Door Arc Swing:</b> Door swing radius is completely unobstructed by any fixture.</div>
+        <div style="color:#34d399;">✓ <b>Wet / Dry Zoning:</b> Shower enclosure segregated to protect drywall and vanity woodwork.</div>
+      </div>
+    </div>
+    """
+
     dual_view_ui = f"""
-<div style="background:#0e1117; border-radius:10px; padding:12px; border:1px solid #30363d; margin-top:12px;">
-  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #21262d; padding-bottom:8px; margin-bottom:10px;">
-    <span style="color:#58a6ff; font-weight:bold; font-size:13px;">📐 KOHLER DUAL-VIEW SPATIAL VISUALIZER</span>
-    <span style="color:#8b949e; font-size:11px;">Dimensions: {r_w:.1f}' × {r_l:.1f}' ({sq_ft:.1f} sq ft)</span>
-  </div>
+<div class="kohler-spatial-studio-card" style="background:#070b14; border:1px solid #1e3a8a; border-radius:12px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,0.7), 0 0 15px rgba(37,99,235,0.15); font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
   
-  <div style="margin-bottom:14px;">
-    <div style="color:#f0f6fc; font-size:12px; font-weight:600; margin-bottom:6px;">[📐 View 1: 2D Architectural Clearance Blueprint]</div>
-    {svg_2d}
+  <!-- Studio Header -->
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid #1e293b; padding-bottom:12px; margin-bottom:14px;">
+    <div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="background:linear-gradient(135deg, #1d4ed8, #0284c7); color:#ffffff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; letter-spacing:0.5px;">KOHLER SPATIAL STUDIO</span>
+        <span style="color:#f8fafc; font-weight:700; font-size:15px;">{room_type.upper()}</span>
+      </div>
+      <div style="color:#94a3b8; font-size:12px; margin-top:3px;">
+        <span style="color:#38bdf8; font-weight:600;">{r_w:.1f}' × {r_l:.1f}'</span> ({sq_ft:.1f} sq ft) • Coordinated Finish: <span style="color:#e2e8f0; font-weight:600;">{focal_finish}</span>
+      </div>
+    </div>
+    
+    <div>
+      <span style="background:#0f172a; border:1px solid {status_badge_border}; color:{status_badge_color}; font-size:12px; font-weight:600; padding:4px 12px; border-radius:20px;">
+        {status_badge_text}
+      </span>
+    </div>
   </div>
 
-  <div>
-    <div style="color:#f0f6fc; font-size:12px; font-weight:600; margin-bottom:6px;">[🧊 View 2: Interactive 3D WebGL Room Model]</div>
-    <iframe src="data:text/html;base64,{b64_3d}" width="100%" height="430" style="border:none; border-radius:8px; background:#0b0f19;"></iframe>
+  <!-- Studio Interactive Tabs -->
+  <div style="display:flex; gap:8px; margin-bottom:14px; background:#0b0f19; padding:4px; border-radius:8px; border:1px solid #1e293b;">
+    <button id="btn-tab-3d" onclick="document.querySelectorAll('.spatial-pane').forEach(function(el){{el.style.display='none';}}); document.getElementById('pane-tab-3d').style.display='block'; document.getElementById('btn-tab-3d').style.background='#1d4ed8'; document.getElementById('btn-tab-3d').style.color='#ffffff'; document.getElementById('btn-tab-3d').style.borderColor='#38bdf8'; document.getElementById('btn-tab-2d').style.background='#0f172a'; document.getElementById('btn-tab-2d').style.color='#94a3b8'; document.getElementById('btn-tab-2d').style.borderColor='#1e293b'; document.getElementById('btn-tab-spec').style.background='#0f172a'; document.getElementById('btn-tab-spec').style.color='#94a3b8'; document.getElementById('btn-tab-spec').style.borderColor='#1e293b';" style="flex:1; padding:8px 12px; background:#1d4ed8; color:#ffffff; border:1px solid #38bdf8; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; box-shadow:0 0 10px rgba(56,189,248,0.3);">
+      🧊 3D WebGL Room
+    </button>
+    <button id="btn-tab-2d" onclick="document.querySelectorAll('.spatial-pane').forEach(function(el){{el.style.display='none';}}); document.getElementById('pane-tab-2d').style.display='block'; document.getElementById('btn-tab-2d').style.background='#1d4ed8'; document.getElementById('btn-tab-2d').style.color='#ffffff'; document.getElementById('btn-tab-2d').style.borderColor='#38bdf8'; document.getElementById('btn-tab-3d').style.background='#0f172a'; document.getElementById('btn-tab-3d').style.color='#94a3b8'; document.getElementById('btn-tab-3d').style.borderColor='#1e293b'; document.getElementById('btn-tab-spec').style.background='#0f172a'; document.getElementById('btn-tab-spec').style.color='#94a3b8'; document.getElementById('btn-tab-spec').style.borderColor='#1e293b';" style="flex:1; padding:8px 12px; background:#0f172a; color:#94a3b8; border:1px solid #1e293b; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
+      📐 2D CAD Blueprint
+    </button>
+    <button id="btn-tab-spec" onclick="document.querySelectorAll('.spatial-pane').forEach(function(el){{el.style.display='none';}}); document.getElementById('pane-tab-spec').style.display='block'; document.getElementById('btn-tab-spec').style.background='#1d4ed8'; document.getElementById('btn-tab-spec').style.color='#ffffff'; document.getElementById('btn-tab-spec').style.borderColor='#38bdf8'; document.getElementById('btn-tab-3d').style.background='#0f172a'; document.getElementById('btn-tab-3d').style.color='#94a3b8'; document.getElementById('btn-tab-3d').style.borderColor='#1e293b'; document.getElementById('btn-tab-2d').style.background='#0f172a'; document.getElementById('btn-tab-2d').style.color='#94a3b8'; document.getElementById('btn-tab-2d').style.borderColor='#1e293b';" style="flex:1; padding:8px 12px; background:#0f172a; color:#94a3b8; border:1px solid #1e293b; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
+      📋 Specs & Clearances
+    </button>
+  </div>
+
+  <!-- Pane 1: 3D WebGL Room -->
+  <div id="pane-tab-3d" class="spatial-pane" style="display:block;">
+    <div style="position:relative; width:100%; border-radius:8px; overflow:hidden; border:1px solid #1e3a8a; box-shadow:0 4px 20px rgba(0,0,0,0.6);">
+      <iframe id="threejs-frame" src="data:text/html;base64,{b64_3d}" width="100%" height="470" style="border:none; display:block; background:#060913;"></iframe>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:11px; color:#64748b;">
+      <span>🖱️ <b>Rotate:</b> Left-Click Drag | <b>Pan:</b> Right-Click Drag | <b>Zoom:</b> Mouse Scroll</span>
+      <span style="color:#38bdf8; font-weight:600;">Three.js WebGL Engine</span>
+    </div>
+  </div>
+
+  <!-- Pane 2: 2D CAD Blueprint -->
+  <div id="pane-tab-2d" class="spatial-pane" style="display:none;">
+    <div style="background:#070c18; border-radius:8px; padding:10px; border:1px solid #1e3a8a; display:flex; justify-content:center; box-shadow:0 4px 20px rgba(0,0,0,0.6);">
+      {svg_2d}
+    </div>
+    <div style="display:flex; gap:16px; margin-top:8px; font-size:11px; color:#64748b; flex-wrap:wrap;">
+      <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; border:1px dashed #0284c7; display:inline-block;"></span> 15" Sanitary Clearance</span>
+      <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; border:1px dashed #eab308; display:inline-block;"></span> 30" Door Arc Swing</span>
+      <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#131e33; border:1px solid #2563eb; display:inline-block;"></span> Architecture Grid</span>
+    </div>
+  </div>
+
+  <!-- Pane 3: Specs & Clearances -->
+  <div id="pane-tab-spec" class="spatial-pane" style="display:none;">
+    {spec_table_html}
   </div>
 </div>
 """
@@ -585,15 +711,12 @@ def optimize_space_and_budget(
     global _LATEST_VISUAL_LAYOUT
     _LATEST_VISUAL_LAYOUT = dual_view_ui
 
-    surplus_or_deficit = budget - grand_total
-    status_str = f"✅ Fits strictly within budget! Surplus remaining: ₹{surplus_or_deficit:,.2f} INR" if surplus_or_deficit >= 0 else f"⚠️ Exceeds budget by ₹{-surplus_or_deficit:,.2f} INR"
-
     lines = [
         f"### 📐 Space & Budget Optimized Bathroom Package ({room_type})",
         "----------------------------------------------------------------------",
         f"Spatial Specs: {r_w:.1f}' Width × {r_l:.1f}' Length ({sq_ft:.1f} sq ft total area)",
         f"Budget Constraint: Max ₹{budget:,.2f} INR",
-        f"Feasibility Status: {status_str}",
+        f"Feasibility Status: {status_badge_text}",
         f"Primary Coordinated Finish: {focal_finish}",
         "",
         "Selected Code-Compliant Fixtures:",
@@ -621,10 +744,39 @@ def optimize_space_and_budget(
         f"  ✓ Sanitary Clearance: Toilet placed with ≥15\" centerline clearance and ≥21\" front access.",
         f"  ✓ Circulation Flow: Vanity positioned clear of the 30\" door swing radius.",
         f"  ✓ Wet/Dry Zoning: Shower enclosure segregated to prevent moisture intrusion.",
-        "  ✓ Visual Layout Rendered: 2D Blueprint & 3D WebGL Room Model ready."
+        "  ✓ Visual Layout Rendered: 2D Blueprint & 3D WebGL Room Model ready in Spatial Studio."
     ])
 
     return "\n".join(lines)
+
+def get_default_visual_layout() -> str:
+    """Returns the default sleek Blue & Black welcome state for the right-hand studio panel."""
+    return """
+    <div style="background:#070b14; border:1px solid #1e3a8a; border-radius:12px; padding:28px 20px; text-align:center; min-height:510px; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow:0 8px 30px rgba(0,0,0,0.7), 0 0 15px rgba(37,99,235,0.15);">
+      <div style="width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg, #1e3a8a, #0284c7); display:flex; align-items:center; justify-content:center; font-size:30px; margin-bottom:16px; box-shadow:0 0 20px rgba(56,189,248,0.4);">
+        📐
+      </div>
+      <h3 style="color:#f8fafc; font-size:19px; font-weight:700; margin:0 0 8px 0;">Kohler Spatial Studio Ready</h3>
+      <p style="color:#94a3b8; font-size:13px; max-width:440px; line-height:1.6; margin:0 0 24px 0;">
+        Ask your AI Concierge for a bathroom layout (e.g. <i>"Design an 8x6 ft modern bathroom under ₹2,50,000"</i>) or click one of the quick action buttons. The studio will dynamically generate:
+      </p>
+
+      <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap; max-width:500px; margin-bottom:24px;">
+        <div style="background:#0f172a; border:1px solid #1e3a8a; border-radius:8px; padding:14px; width:220px; text-align:left; box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+          <div style="color:#60a5fa; font-weight:700; font-size:13px; margin-bottom:6px;">📐 2D CAD Blueprint</div>
+          <div style="color:#64748b; font-size:11px; line-height:1.5;">Architectural floorplan with 15" sanitary clearance, 21" front access, & 30" door swing arc.</div>
+        </div>
+        <div style="background:#0f172a; border:1px solid #1e3a8a; border-radius:8px; padding:14px; width:220px; text-align:left; box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+          <div style="color:#38bdf8; font-weight:700; font-size:13px; margin-bottom:6px;">🧊 3D WebGL Room Model</div>
+          <div style="color:#64748b; font-size:11px; line-height:1.5;">Interactive 360° isometric room with metallic finish materials, lighting, and orbit controls.</div>
+        </div>
+      </div>
+
+      <div style="padding:8px 18px; background:#0b1329; border:1px solid #1d4ed8; border-radius:20px; font-size:12px; color:#93c5fd;">
+        💡 Click <b>📐 8x6 Modern Bath Plan</b> below the chat to test right away
+      </div>
+    </div>
+    """
 
 _LATEST_VISUAL_LAYOUT: Optional[str] = None
 

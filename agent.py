@@ -45,7 +45,9 @@ Operational Guidelines:
 - When the user asks for quotes, packages, multiple items, or discounts, retrieve the prices first, then call 'price_and_package_calculator' for exact math.
 - When the user asks what goes with a product, wants a matching aesthetic/finish, asks for bathroom combination packages, or wants style coordination, call 'aesthetic_combo_recommender' to present the matched suite and combo savings.
 - When the user mentions room dimensions (e.g. '8x6', '10 by 7 ft', 'powder room space') or specifies a budget ceiling for a room layout, call 'space_and_budget_optimizer' to calculate the layout and Dual-View 2D/3D visualizer.
-- When presenting 'space_and_budget_optimizer' results, DO NOT critique or explain the code. Deliver your consultative sales quote: present the recommended fixtures, confirm code clearances and budget fit, explain the combo savings in ₹ INR, and include the visualizer block.
+- When presenting 'space_and_budget_optimizer' results:
+  1. DO NOT output any raw HTML, <iframe>, <svg>, or code tags in your chat text. The architectural blueprint and 3D WebGL model are automatically rendered in the dedicated Spatial Studio on the right.
+  2. Deliver an elite consultative sales quote: warmly congratulate the customer, present the curated fixtures with prices in ₹ INR, explain the promotional combo savings, confirm code clearances (15" centerline, 21" front clearance, 30" door swing), and invite them to explore the 2D CAD Blueprint and 3D WebGL model in the Spatial Studio panel on the right.
 - When the user asks about delivery or stock, use 'inventory_and_delivery_checker'.
 - SPEED INSTRUCTION: Do NOT output your internal thinking scratchpad (no 'Here is my thought process'). Be direct, concise, and professional.
 """
@@ -121,6 +123,26 @@ def get_shared_catalog_tool(llm=None):
         _SHARED_CATALOG_TOOL = get_catalog_tool(llm=llm, use_cache=True)
     return _SHARED_CATALOG_TOOL
 
+import re
+
+def clean_ai_chat_text(text: str) -> str:
+    """Strips any stray HTML tags, iframes, svgs, base64 strings, or internal thinking from AI response."""
+    if not text:
+        return ""
+    # Strip iframes, svgs, scripts, styles
+    text = re.sub(r'<iframe[\s\S]*?</iframe>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'<svg[\s\S]*?</svg>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'<script[\s\S]*?</script>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'<style[\s\S]*?</style>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'<div[\s\S]*?>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'</div>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'data:text/html;base64,[A-Za-z0-9+/=]+', '', text)
+    # Strip raw thinking patterns if any
+    text = re.sub(r'<think>[\s\S]*?</think>', '', text, flags=re.IGNORECASE)
+    # Clean whitespace
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
+
 async def smart_process_query(agent: AgentWorkflow, user_msg: str, ctx: Context = None):
     """
     Smart Query Dispatcher (Option 3 & 4):
@@ -147,7 +169,8 @@ async def smart_process_query(agent: AgentWorkflow, user_msg: str, ctx: Context 
             f"Keep it concise (1-2 short paragraphs), upbeat, and focused on getting them excited to buy Kohler fixtures."
         )
         response = await llm.acomplete(sales_prompt)
-        yield {"type": "final", "content": str(response)}
+        clean_text = clean_ai_chat_text(str(response))
+        yield {"type": "final", "content": clean_text, "visual_html": None}
 
     elif route == QueryRoute.FAST_PATH_RAG:
         yield {"type": "route", "badge": "[Fast-Path] 1-Step Retrieval & Reranking"}
@@ -159,7 +182,8 @@ async def smart_process_query(agent: AgentWorkflow, user_msg: str, ctx: Context 
         yield {"type": "activity", "msg": "Searching Kohler catalog with local BGE embeddings & Cross-Encoder reranker..."}
         
         response = await query_engine.aquery(user_msg)
-        yield {"type": "final", "content": str(response)}
+        clean_text = clean_ai_chat_text(str(response))
+        yield {"type": "final", "content": clean_text, "visual_html": None}
 
     else:
         # Complex multi-step Agentic Path
@@ -177,16 +201,21 @@ async def smart_process_query(agent: AgentWorkflow, user_msg: str, ctx: Context 
         final_response = await handler
         final_text = str(final_response)
 
+        visual_html = None
         try:
             from tools.space_optimizer import get_latest_visual_layout, clear_latest_visual_layout
-            layout_ui = get_latest_visual_layout()
-            if layout_ui:
-                final_text = final_text.strip() + "\n\n" + layout_ui
-                clear_latest_visual_layout()
+            visual_html = get_latest_visual_layout()
+            clear_latest_visual_layout()
         except Exception:
             pass
 
-        yield {"type": "final", "content": final_text}
+        clean_text = clean_ai_chat_text(final_text)
+
+        # If visual layout was produced and LLM didn't mention checking the studio, append a polite callout
+        if visual_html and "spatial studio" not in clean_text.lower() and "right panel" not in clean_text.lower():
+            clean_text += "\n\n📐 *I have rendered your custom 2D CAD Blueprint and interactive 3D WebGL Room Model in the Spatial Studio on the right panel. Feel free to rotate, zoom, and inspect clearances!*"
+
+        yield {"type": "final", "content": clean_text, "visual_html": visual_html}
 
 if __name__ == "__main__":
     import asyncio

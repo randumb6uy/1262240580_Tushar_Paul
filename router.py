@@ -48,6 +48,17 @@ def classify_query(query: str) -> QueryRoute:
     Fast, deterministic intent classifier (0ms overhead, 0 tokens).
     Routes queries to the fastest optimal execution path.
     """
+    if isinstance(query, (list, tuple)):
+        parts = []
+        for x in query:
+            if isinstance(x, dict):
+                parts.append(str(x.get("text", x)))
+            else:
+                parts.append(str(x))
+        query = " ".join(parts)
+    elif not isinstance(query, str):
+        query = str(query)
+
     clean_q = query.strip().lower()
 
     # 1. Direct Chit-Chat / Greeting
