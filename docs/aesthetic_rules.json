@@ -1,0 +1,204 @@
+{
+  "discount_tiers": {
+    "2_items": {
+      "discount_percent": 10.0,
+      "tier_name": "Aesthetic Duo Combo (10% Off)"
+    },
+    "3_items": {
+      "discount_percent": 15.0,
+      "tier_name": "Complete Design Suite (15% Off)"
+    },
+    "4_or_5_items": {
+      "discount_percent": 18.0,
+      "tier_name": "Full Master Bath Remodel Package (18% Off)"
+    },
+    "6_or_more_items": {
+      "discount_percent": 22.0,
+      "tier_name": "Whole-Home Ultimate Luxury Estate Package (22% Off)"
+    }
+  },
+  "finish_coordination": {
+    "Matte Black": {
+      "compatible_finishes": [
+        "Matte Black",
+        "Matte Black, solid brass",
+        "Matte Black with Chrome accents",
+        "Matte Black with Vibrant Brushed Moderne Brass",
+        "Shadow Oak veneer",
+        "White laminate",
+        "Matte Charcoal",
+        "White vitreous china"
+      ],
+      "description": "Crisp, architectural, high-contrast urban modern aesthetic."
+    },
+    "Vibrant Brushed Brass": {
+      "compatible_finishes": [
+        "Vibrant Brushed Moderne Brass",
+        "Vibrant Brushed Bronze",
+        "Bourbon glaze textured vitreous ceramic",
+        "Translucent Amber bronze glass",
+        "Midnight Blue lacquer",
+        "Natural Teak",
+        "Walnut finish"
+      ],
+      "description": "Warm, upscale mid-century luxury with rich metallic patinas."
+    },
+    "Brushed Nickel": {
+      "compatible_finishes": [
+        "Brushed Nickel",
+        "Brushed Nickel, solid brass",
+        "Natural Teak",
+        "White Lithocast",
+        "Gloss White heavy acrylic",
+        "White vitreous china"
+      ],
+      "description": "Tranquil, understated satin warmth ideal for organic Japanese Zen and spa sanctuaries."
+    },
+    "Polished Chrome": {
+      "compatible_finishes": [
+        "Polished Chrome",
+        "Polished Chrome & glass touch screen",
+        "Polished Chrome & Glass Touchscreen",
+        "Vibrant Polished Nickel, cast brass",
+        "Anodized Aluminum",
+        "Gloss white",
+        "White vitreous china"
+      ],
+      "description": "Timeless, mirror-like brilliance suited for contemporary and digital high-tech suites."
+    },
+    "Oil-Rubbed Bronze": {
+      "compatible_finishes": [
+        "Oil-Rubbed Bronze, cast brass",
+        "Oil-Rubbed Bronze, solid brass",
+        "Dark Espresso stained hardwood",
+        "White fireclay ceramic",
+        "Mohair Grey painted wood",
+        "White vitreous china"
+      ],
+      "description": "Rich antique warmth and heritage craftsmanship for classic or farmhouse designs."
+    }
+  },
+  "style_suites": {
+    "modern_minimalist": {
+      "name": "Modern Minimalist & Urban Black Suite",
+      "style_vibe": "Clean geometric lines, bold Matte Black hardware, and floating space-saving fixtures.",
+      "focal_finish": "Matte Black",
+      "recommended_products": [
+        "Kohler Veer Single-Handle",
+        "Kohler Statement Oblong Shower Package",
+        "Kohler Marabou Wall-Hung",
+        "Kohler Veil Wall-Hung",
+        "Kohler Voric Matte Black Vanity Light Bar",
+        "Kohler Veer Modern Matte Black Accessory Pack"
+      ]
+    },
+    "modern_powder_room": {
+      "name": "Modern Loft Compact Powder Room",
+      "style_vibe": "High-impact space-saving setup with matte charcoal floating vanity, vessel basin, and LED halo lighting.",
+      "focal_finish": "Matte Black",
+      "recommended_products": [
+        "Kohler Components Tall Single-Handle",
+        "Kohler Forefront Rectangular Vessel",
+        "Kohler Verity 24\" Compact Floating Vanity",
+        "Kohler Avoir Backlit LED Mirror",
+        "Kohler San Souci Low-Profile"
+      ]
+    },
+    "mid_century_luxury": {
+      "name": "Mid-Century Warm Brass & Architectural Suite",
+      "style_vibe": "Elevated luxury pairing Vibrant Brushed Moderne Brass fixtures with rich navy lacquer and fluted freestanding soaking.",
+      "focal_finish": "Vibrant Brushed Brass",
+      "recommended_products": [
+        "Kohler Purist Widespread",
+        "Kohler HydroRail-R Retrofit Column",
+        "Kohler Southerk Double",
+        "Kohler Sunstruck Oval Tub with Fluted Shroud",
+        "Kohler Purist Wall Sconce Pair",
+        "Kohler Purist 24\" Towel Bar & Hook Set"
+      ]
+    },
+    "artisan_brass_powder": {
+      "name": "Boutique Artisan Brass Powder Room",
+      "style_vibe": "Jewel-box guest bath pairing hand-carved Bourbon glazed vessel with pentagonal brass faucet and wall sconces.",
+      "focal_finish": "Vibrant Brushed Brass",
+      "recommended_products": [
+        "Kohler Occasion Single-Control",
+        "Kohler Artist Editions Derring Carved Vessel",
+        "Kohler Jacquard Petite",
+        "Kohler Purist Wall Sconce Pair",
+        "Kohler Veil Intelligent"
+      ]
+    },
+    "organic_zen_spa": {
+      "name": "Japanese Zen & Organic Spa Sanctuary",
+      "style_vibe": "Subtle brushed nickel metals paired with moisture-resistant solid teak and deep soaking serenity.",
+      "focal_finish": "Brushed Nickel",
+      "recommended_products": [
+        "Kohler Stillness Wall-Mount",
+        "Kohler Awaken Thermostatic System",
+        "Kohler Statement 12\" Round Contemporary Rainhead",
+        "Kohler Jute Solid Teak",
+        "Kohler Underscore Drop-In/Undermount",
+        "Kohler Stillness Brushed Nickel Bath Accessories"
+      ]
+    },
+    "smart_high_tech": {
+      "name": "Connected Luxury High-Tech Smart Suite",
+      "style_vibe": "Futuristic smart toilets, digital touch multi-outlet showers, voice-controlled mirrors, and Harman Kardon audio.",
+      "focal_finish": "Polished Chrome",
+      "recommended_products": [
+        "Kohler Numi 2.0",
+        "Kohler Anthem 3-Outlet Digital Controller",
+        "Kohler Sensate Touchless",
+        "Kohler Moxie Bluetooth Showerhead",
+        "Kohler Verdera Voice Lighted Mirror with Alexa"
+      ]
+    },
+    "touchless_hygiene": {
+      "name": "Touchless Pure Hygiene Suite",
+      "style_vibe": "Zero-touch motion-activated fixtures for seamless germ-free luxury and effortless hygiene.",
+      "focal_finish": "Matte Black & Chrome",
+      "recommended_products": [
+        "Kohler Sensate Touchless",
+        "Kohler San Souci Touchless",
+        "Kohler Avoir Backlit LED Mirror",
+        "Kohler Veer Modern Matte Black Accessory Pack"
+      ]
+    },
+    "classic_heritage": {
+      "name": "Classic Heritage & Stately Traditional Suite",
+      "style_vibe": "Crown-molding architectural pedestals, Shaker woodwork, and antique bronze cross-handle fixtures.",
+      "focal_finish": "Oil-Rubbed Bronze",
+      "recommended_products": [
+        "Kohler Artifacts Gentleman's",
+        "Kohler Artifacts Hotelier Towel Rack",
+        "Kohler Harken Traditional 36\" Vanity",
+        "Kohler Cimarron Two-Piece",
+        "Kohler Artifacts Vintage Bath Sconce"
+      ]
+    },
+    "scandinavian_warm_modern": {
+      "name": "Scandinavian Warm Organic Modern Sanctuary",
+      "style_vibe": "Sensual fluid curves in brushed nickel paired with natural oiled teak and sculptural freestanding soaking.",
+      "focal_finish": "Brushed Nickel & Teak",
+      "recommended_products": [
+        "Kohler Avid Single-Handle",
+        "Kohler Jute Solid Teak",
+        "Kohler Stargaze Freestanding Soaking Tub",
+        "Kohler Avoir Backlit LED Mirror"
+      ]
+    },
+    "two_tone_designer": {
+      "name": "Two-Tone Industrial Chic Suite",
+      "style_vibe": "Architectural interplay between Matte Black and Vibrant Brass accents with overhead deluge deluge.",
+      "focal_finish": "Two-Tone Black & Brass",
+      "recommended_products": [
+        "Kohler Tone Widespread",
+        "Kohler Real Rain Overhead Panel",
+        "Kohler Marabou Wall-Hung",
+        "Kohler Veil Wall-Hung",
+        "Kohler Voric Matte Black Vanity Light Bar"
+      ]
+    }
+  }
+}

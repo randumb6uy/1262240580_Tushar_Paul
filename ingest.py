@@ -53,6 +53,8 @@ def load_jsonl_documents(jsonl_path: str = "docs/products.jsonl") -> list[Docume
                     "currency": item.get("currency", "INR"),
                     "usd_price": float(item.get("usd_price", 0.0)),
                     "finish": item["finish"],
+                    "finish_family": item.get("finish_family", ""),
+                    "aesthetic_style": item.get("aesthetic_style", ""),
                 },
                 excluded_llm_metadata_keys=["text"],
             )

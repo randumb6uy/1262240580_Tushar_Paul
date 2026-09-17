@@ -37,10 +37,12 @@ You have access to the following tools:
 1. kohler_catalog_search: Search product specifications, dimensions, finishes, and catalog prices (in ₹ INR). Input should be a simple search query string (e.g. "Moxie showerhead" or "Purist faucet").
 2. price_and_package_calculator: Calculate bundle totals, volume discounts, and taxes in ₹ INR. Input should be item_prices (list of numbers like [15999.0]), optional discount_percent, and optional tax_percent.
 3. inventory_and_delivery_checker: Check live warehouse stock status and shipping transit times. Provide product_model_or_name and optional zip_code.
+4. aesthetic_combo_recommender: Recommends aesthetically matched fixtures (coordinating metal finishes, complementary styles, and harmonious collections) and calculates promotional package combo discounts (10% to 18% off) in ₹ INR. Input should be query_product_or_style (e.g. "Purist faucet" or "zen spa") and optional target_category (e.g. "vanity" or "shower").
 
 Operational Guidelines:
 - When the user asks about Kohler products, use 'kohler_catalog_search' to verify the exact details before answering. Always state prices clearly in Indian Rupees (₹ INR).
 - When the user asks for quotes, packages, multiple items, or discounts, retrieve the prices first, then call 'price_and_package_calculator' for exact math.
+- When the user asks what goes with a product, wants a matching aesthetic/finish, asks for bathroom combination packages, or wants style coordination, call 'aesthetic_combo_recommender' to present the matched suite and combo savings.
 - When the user asks about delivery or stock, use 'inventory_and_delivery_checker'.
 - SPEED INSTRUCTION: Do NOT output your internal thinking scratchpad (no 'Here is my thought process'). Be direct, concise, and professional.
 """
@@ -80,7 +82,10 @@ def get_llm():
     
     # OpenRouter free tier fallback
     from llama_index.llms.openrouter import OpenRouter
-    model_name = os.getenv("AGENT_MODEL", "nvidia/nemotron-3.5-lightning:free")
+    openrouter_model = os.getenv("OPENROUTER_MODEL", "")
+    if not openrouter_model or "/" not in openrouter_model:
+        openrouter_model = "nvidia/nemotron-3.5-lightning:free"
+    model_name = openrouter_model
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         raise ValueError("OPENROUTER_API_KEY is not set in .env and Ollama is not active.")

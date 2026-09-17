@@ -50,10 +50,15 @@ TEST_QUESTIONS = [
         "category": "Multi-Product Package Quote (INR)",
         "question": "How much would it cost to buy both the Veer faucet and the Poplin vanity together in INR?",
     },
-    # 7. Out-of-catalog boundary check
+    # 7. Out-of-Catalog boundary check
     {
         "category": "Out-of-Catalog Boundary Test",
         "question": "Do you sell Kohler kitchen refrigerators or dishwashers?",
+    },
+    # 8. Aesthetic matching & coordinated combo discount
+    {
+        "category": "Aesthetic Finish Matching & Combo Discount",
+        "question": "Can you recommend a matching faucet and vanity package for a modern bathroom, and what combo discount do I get?",
     },
 ]
 
@@ -70,7 +75,7 @@ async def run_test_suite():
     for idx, item in enumerate(TEST_QUESTIONS, 1):
         cat = item["category"]
         q = item["question"]
-        print(f"\n--- [Test {idx}/7: {cat}] ---")
+        print(f"\n--- [Test {idx}/{len(TEST_QUESTIONS)}: {cat}] ---")
         print(f"Question: \"{q}\"")
         
         t0 = time.perf_counter()
