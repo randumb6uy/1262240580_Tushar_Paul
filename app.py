@@ -387,7 +387,7 @@ def optimize_space_and_budget(
 # ==============================================================================
 
 def generate_2d_blueprint_svg(design: Dict[str, Any]) -> str:
-    """Generates a clean architectural 2D top-down SVG blueprint on light grid."""
+    """Generates an architectural 2D top-down SVG blueprint adapting cleanly to light & dark themes."""
     r_w = design.get("width_ft", 6.0)
     r_l = design.get("length_ft", 8.0)
     items = design.get("layout_items", [])
@@ -402,18 +402,51 @@ def generate_2d_blueprint_svg(design: Dict[str, Any]) -> str:
     total_h = svg_h + (padding * 2)
 
     svg_lines = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {total_w} {total_h}" width="100%" height="450" style="background:#f8fafc; font-family:Inter,system-ui,sans-serif;">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {total_w} {total_h}" width="100%" height="450" class="blueprint-svg">',
         '<defs>',
+        '  <style>',
+        '    .blueprint-svg { background: #f8fafc; font-family: Inter,system-ui,sans-serif; border-radius: 8px; transition: background 0.2s ease; }',
+        '    .bp-grid-line { stroke: #e2e8f0; }',
+        '    .bp-wall { stroke: #0f172a; fill: url(#lightgrid); }',
+        '    .bp-text-dim { fill: #475569; font-size: 12px; font-weight: 600; }',
+        '    .bp-text-title { fill: #0f172a; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }',
+        '    .bp-door-arc { stroke: #94a3b8; }',
+        '    .bp-door-line { stroke: #0f172a; }',
+        '    .bp-door-text { fill: #64748b; font-size: 10px; }',
+        '    .bp-clearance { stroke: #3b82f6; }',
+        '    .bp-fix-stroke { stroke: #0f172a; fill: #ffffff; }',
+        '    .bp-fix-subtle { stroke: #64748b; fill: #f8fafc; }',
+        '    .bp-shower-rect { fill: #f0f9ff; stroke: #0284c7; }',
+        '    .bp-shower-dot { fill: #cbd5e1; stroke: #0284c7; }',
+        '    .bp-shower-cross { stroke: #e0f2fe; }',
+        '    .bp-fix-label { fill: #0f172a; font-size: 10px; font-weight: 600; }',
+        '',
+        '    :root.dark .blueprint-svg, body.dark .blueprint-svg, html.dark .blueprint-svg { background: #090d16 !important; }',
+        '    :root.dark .bp-grid-line, body.dark .bp-grid-line, html.dark .bp-grid-line { stroke: #1a253a !important; }',
+        '    :root.dark .bp-wall, body.dark .bp-wall, html.dark .bp-wall { stroke: #64748b !important; }',
+        '    :root.dark .bp-text-dim, body.dark .bp-text-dim, html.dark .bp-text-dim { fill: #94a3b8 !important; }',
+        '    :root.dark .bp-text-title, body.dark .bp-text-title, html.dark .bp-text-title { fill: #f8fafc !important; }',
+        '    :root.dark .bp-door-arc, body.dark .bp-door-arc, html.dark .bp-door-arc { stroke: #475569 !important; }',
+        '    :root.dark .bp-door-line, body.dark .bp-door-line, html.dark .bp-door-line { stroke: #94a3b8 !important; }',
+        '    :root.dark .bp-door-text, body.dark .bp-door-text, html.dark .bp-door-text { fill: #64748b !important; }',
+        '    :root.dark .bp-clearance, body.dark .bp-clearance, html.dark .bp-clearance { stroke: #60a5fa !important; }',
+        '    :root.dark .bp-fix-stroke, body.dark .bp-fix-stroke, html.dark .bp-fix-stroke { stroke: #94a3b8 !important; fill: #131c31 !important; }',
+        '    :root.dark .bp-fix-subtle, body.dark .bp-fix-subtle, html.dark .bp-fix-subtle { stroke: #475569 !important; fill: #1e293b !important; }',
+        '    :root.dark .bp-shower-rect, body.dark .bp-shower-rect, html.dark .bp-shower-rect { fill: #0c4a6e !important; stroke: #38bdf8 !important; }',
+        '    :root.dark .bp-shower-dot, body.dark .bp-shower-dot, html.dark .bp-shower-dot { fill: #0284c7 !important; stroke: #38bdf8 !important; }',
+        '    :root.dark .bp-shower-cross, body.dark .bp-shower-cross, html.dark .bp-shower-cross { stroke: #0369a1 !important; }',
+        '    :root.dark .bp-fix-label, body.dark .bp-fix-label, html.dark .bp-fix-label { fill: #f8fafc !important; }',
+        '  </style>',
         '  <pattern id="lightgrid" width="22.5" height="22.5" patternUnits="userSpaceOnUse">',
-        '    <path d="M 22.5 0 L 0 0 0 22.5" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>',
+        '    <path d="M 22.5 0 L 0 0 0 22.5" fill="none" class="bp-grid-line" stroke-width="0.8"/>',
         '  </pattern>',
         '</defs>',
         # Background Floor with 1ft Grid
-        f'<rect x="{padding}" y="{padding}" width="{svg_w}" height="{svg_h}" fill="url(#lightgrid)" stroke="#0f172a" stroke-width="2"/>',
+        f'<rect x="{padding}" y="{padding}" width="{svg_w}" height="{svg_h}" class="bp-wall" stroke-width="2"/>',
         # Dimension Callouts
-        f'<text x="{padding + svg_w/2}" y="{padding - 15}" fill="#475569" font-size="12" font-weight="600" text-anchor="middle">← {r_w:.1f} ft ({int(r_w*12)}") →</text>',
-        f'<text x="{padding - 15}" y="{padding + svg_h/2}" fill="#475569" font-size="12" font-weight="600" text-anchor="middle" transform="rotate(-90 {padding - 15} {padding + svg_h/2})">← {r_l:.1f} ft ({int(r_l*12)}") →</text>',
-        f'<text x="{padding + 10}" y="{padding + 20}" fill="#0f172a" font-size="11" font-weight="600" letter-spacing="0.5px">KOHLER BLUEPRINT — {room_type.upper()}</text>',
+        f'<text x="{padding + svg_w/2}" y="{padding - 15}" class="bp-text-dim" text-anchor="middle">← {r_w:.1f} ft ({int(r_w*12)}") →</text>',
+        f'<text x="{padding - 15}" y="{padding + svg_h/2}" class="bp-text-dim" text-anchor="middle" transform="rotate(-90 {padding - 15} {padding + svg_h/2})">← {r_l:.1f} ft ({int(r_l*12)}") →</text>',
+        f'<text x="{padding + 10}" y="{padding + 20}" class="bp-text-title">KOHLER BLUEPRINT — {room_type.upper()}</text>',
     ]
 
     # Door Swing Arc (Bottom-left)
@@ -421,9 +454,9 @@ def generate_2d_blueprint_svg(design: Dict[str, Any]) -> str:
     door_x = padding
     door_y = padding + svg_h
     svg_lines.append(
-        f'<path d="M {door_x} {door_y - door_w} A {door_w} {door_w} 0 0 1 {door_x + door_w} {door_y}" fill="none" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="1.2"/>'
-        f'<line x1="{door_x}" y1="{door_y}" x2="{door_x}" y2="{door_y - door_w}" stroke="#0f172a" stroke-width="2"/>'
-        f'<text x="{door_x + 8}" y="{door_y - 8}" fill="#64748b" font-size="10">30" Door Arc</text>'
+        f'<path d="M {door_x} {door_y - door_w} A {door_w} {door_w} 0 0 1 {door_x + door_w} {door_y}" fill="none" class="bp-door-arc" stroke-dasharray="4,4" stroke-width="1.2"/>'
+        f'<line x1="{door_x}" y1="{door_y}" x2="{door_x}" y2="{door_y - door_w}" class="bp-door-line" stroke-width="2"/>'
+        f'<text x="{door_x + 8}" y="{door_y - 8}" class="bp-door-text">30" Door Arc</text>'
     )
 
     # Render Fixtures
@@ -437,34 +470,34 @@ def generate_2d_blueprint_svg(design: Dict[str, Any]) -> str:
 
         # 15" Sanitary Clearance Zone (Dashed box)
         svg_lines.append(
-            f'<rect x="{ix - 5}" y="{iy - 5}" width="{iw + 10}" height="{ih + 10}" fill="none" stroke="#3b82f6" stroke-dasharray="3,3" stroke-width="1"/>'
+            f'<rect x="{ix - 5}" y="{iy - 5}" width="{iw + 10}" height="{ih + 10}" fill="none" class="bp-clearance" stroke-dasharray="3,3" stroke-width="1"/>'
         )
 
         # Fixture Graphic
         if cat == "toilets":
             svg_lines.append(
-                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{int(ih*0.35)}" rx="2" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/>'
-                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih*0.65}" rx="{iw*0.42}" ry="{ih*0.32}" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/>'
+                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{int(ih*0.35)}" rx="2" class="bp-fix-stroke" stroke-width="1.5"/>'
+                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih*0.65}" rx="{iw*0.42}" ry="{ih*0.32}" class="bp-fix-stroke" stroke-width="1.5"/>'
             )
         elif cat == "showers":
             svg_lines.append(
-                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5"/>'
-                f'<circle cx="{ix + iw/2}" cy="{iy + ih/2}" r="5" fill="#cbd5e1" stroke="#0284c7" stroke-width="1"/>'
-                f'<line x1="{ix}" y1="{iy}" x2="{ix+iw}" y2="{iy+ih}" stroke="#e0f2fe" stroke-width="1"/>'
+                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" class="bp-shower-rect" stroke-width="1.5"/>'
+                f'<circle cx="{ix + iw/2}" cy="{iy + ih/2}" r="5" class="bp-shower-dot" stroke-width="1"/>'
+                f'<line x1="{ix}" y1="{iy}" x2="{ix+iw}" y2="{iy+ih}" class="bp-shower-cross" stroke-width="1"/>'
             )
         elif cat == "tubs_and_sinks":
             svg_lines.append(
-                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="8" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/>'
-                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih/2}" rx="{iw*0.4}" ry="{ih*0.35}" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>'
+                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="8" class="bp-fix-stroke" stroke-width="1.5"/>'
+                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih/2}" rx="{iw*0.4}" ry="{ih*0.35}" class="bp-fix-subtle" stroke-width="1"/>'
             )
         else:  # Vanity
             svg_lines.append(
-                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="3" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/>'
-                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih/2}" rx="{min(iw*0.3, 16)}" ry="{min(ih*0.3, 12)}" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>'
+                f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="3" class="bp-fix-stroke" stroke-width="1.5"/>'
+                f'<ellipse cx="{ix + iw/2}" cy="{iy + ih/2}" rx="{min(iw*0.3, 16)}" ry="{min(ih*0.3, 12)}" class="bp-fix-subtle" stroke-width="1"/>'
             )
 
         svg_lines.append(
-            f'<text x="{ix + iw/2}" y="{iy + ih + 13}" fill="#0f172a" font-size="10" font-weight="600" text-anchor="middle">{name}</text>'
+            f'<text x="{ix + iw/2}" y="{iy + ih + 13}" class="bp-fix-label" text-anchor="middle">{name}</text>'
         )
 
     svg_lines.append('</svg>')
@@ -472,7 +505,7 @@ def generate_2d_blueprint_svg(design: Dict[str, Any]) -> str:
 
 
 def generate_3d_webgl_html(design: Dict[str, Any]) -> str:
-    """Generates an embedded Three.js WebGL isometric scene on clean light background."""
+    """Generates an embedded Three.js WebGL isometric scene with adaptive theme support."""
     r_w = design.get("width_ft", 6.0)
     r_l = design.get("length_ft", 8.0)
     items_json = json.dumps(design.get("layout_items", []))
@@ -502,19 +535,28 @@ def generate_3d_webgl_html(design: Dict[str, Any]) -> str:
 <head>
   <meta charset="utf-8">
   <style>
-    body {{ margin: 0; padding: 0; overflow: hidden; background: #f8fafc; font-family: Inter,system-ui,sans-serif; }}
+    body {{ margin: 0; padding: 0; overflow: hidden; background: #f8fafc; font-family: Inter,system-ui,sans-serif; transition: background 0.2s ease; }}
+    body.dark {{ background: #090d16; }}
     #container {{ width: 100%; height: 460px; position: relative; }}
     .badge {{
       position: absolute; top: 12px; left: 14px;
       background: #ffffff; color: #0f172a;
       padding: 4px 10px; border-radius: 6px; font-size: 11px;
       font-weight: 600; border: 1px solid #e2e8f0; pointer-events: none;
+      transition: all 0.2s ease;
+    }}
+    body.dark .badge {{
+      background: #131c31; color: #f8fafc; border-color: #223049;
     }}
     .tip {{
       position: absolute; bottom: 10px; right: 12px;
       background: #ffffff; color: #64748b;
       padding: 3px 8px; border-radius: 4px; font-size: 10px; pointer-events: none;
       border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }}
+    body.dark .tip {{
+      background: #131c31; color: #94a3b8; border-color: #223049;
     }}
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -526,12 +568,28 @@ def generate_3d_webgl_html(design: Dict[str, Any]) -> str:
     <div class="tip">Left-click: Orbit | Right-click: Pan | Scroll: Zoom</div>
   </div>
   <script>
+    function checkParentDark() {{
+      try {{
+        if (window.parent && (window.parent.document.documentElement.classList.contains('dark') || window.parent.document.body.classList.contains('dark'))) {{
+          return true;
+        }}
+        return localStorage.getItem('kohler-theme') === 'dark';
+      }} catch (e) {{
+        return false;
+      }}
+    }}
+
+    let isDark = checkParentDark();
+    if (isDark) {{
+      document.body.classList.add('dark');
+    }}
+
     const container = document.getElementById('container');
     const width = container.clientWidth || 550;
     const height = 460;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf8fafc);
+    scene.background = new THREE.Color(isDark ? 0x090d16 : 0xf8fafc);
 
     const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 1000);
     camera.position.set({r_w * 1.6}, {r_l * 1.9}, {r_w * 2.1});
@@ -550,26 +608,37 @@ def generate_3d_webgl_html(design: Dict[str, Any]) -> str:
     // Lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
     scene.add(ambientLight);
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.55);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
     dirLight.position.set(12, 22, 14);
     dirLight.castShadow = true;
     scene.add(dirLight);
 
-    // Floor (Light tiled plane)
+    // Floor
     const floorGeo = new THREE.PlaneGeometry({r_w}, {r_l});
-    const floorMat = new THREE.MeshStandardMaterial({{ color: 0xf1f5f9, roughness: 0.3 }});
+    const floorMat = new THREE.MeshStandardMaterial({{ 
+      color: isDark ? 0x131c31 : 0xf1f5f9, 
+      roughness: 0.3 
+    }});
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.set({r_w / 2}, 0, {r_l / 2});
     floor.receiveShadow = true;
     scene.add(floor);
 
-    const grid = new THREE.GridHelper(Math.max({r_w}, {r_l}), 10, 0xcbd5e1, 0xe2e8f0);
+    const grid = new THREE.GridHelper(
+      Math.max({r_w}, {r_l}), 
+      10, 
+      isDark ? 0x334466 : 0xcbd5e1, 
+      isDark ? 0x1e293b : 0xe2e8f0
+    );
     grid.position.set({r_w / 2}, 0.01, {r_l / 2});
     scene.add(grid);
 
     // Minimal Cutaway Walls
-    const wallMat = new THREE.MeshStandardMaterial({{ color: 0xffffff, roughness: 0.8 }});
+    const wallMat = new THREE.MeshStandardMaterial({{ 
+      color: isDark ? 0x1a2436 : 0xffffff, 
+      roughness: 0.8 
+    }});
     const backWall = new THREE.Mesh(new THREE.BoxGeometry({r_w}, 4.8, 0.08), wallMat);
     backWall.position.set({r_w / 2}, 2.4, 0);
     scene.add(backWall);
@@ -581,8 +650,8 @@ def generate_3d_webgl_html(design: Dict[str, Any]) -> str:
     // Materials
     const metalMat = new THREE.MeshStandardMaterial({{ color: {mat_color}, metalness: {metalness}, roughness: {roughness} }});
     const ceramicMat = new THREE.MeshStandardMaterial({{ color: 0xffffff, roughness: 0.1 }});
-    const woodMat = new THREE.MeshStandardMaterial({{ color: 0x334155, roughness: 0.6 }});
-    const glassMat = new THREE.MeshPhysicalMaterial({{ color: 0x38bdf8, transparent: true, opacity: 0.3, roughness: 0.1 }});
+    const woodMat = new THREE.MeshStandardMaterial({{ color: isDark ? 0x1e293b : 0x334155, roughness: 0.6 }});
+    const glassMat = new THREE.MeshPhysicalMaterial({{ color: 0x38bdf8, transparent: true, opacity: 0.35, roughness: 0.1 }});
 
     // Fixtures placement
     const items = {items_json};
@@ -603,7 +672,7 @@ def generate_3d_webgl_html(design: Dict[str, Any]) -> str:
         const fMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.7, 16), metalMat);
         fMesh.position.set(x, 3.05, z - (d * 0.25));
         scene.add(fMesh);
-        const mMesh = new THREE.Mesh(new THREE.BoxGeometry(Math.min(w, 2.2), 2.6, 0.04), new THREE.MeshStandardMaterial({{ color: 0xe2e8f0, roughness: 0.1 }}));
+        const mMesh = new THREE.Mesh(new THREE.BoxGeometry(Math.min(w, 2.2), 2.6, 0.04), new THREE.MeshStandardMaterial({{ color: isDark ? 0x334466 : 0xe2e8f0, roughness: 0.1 }}));
         mMesh.position.set(x, 4.4, 0.06);
         scene.add(mMesh);
       }} else if (cat === 'toilets') {{
@@ -628,6 +697,21 @@ def generate_3d_webgl_html(design: Dict[str, Any]) -> str:
       }}
     }});
 
+    // Listen for theme toggle messages from parent
+    window.addEventListener('message', (e) => {{
+      if (e.data && e.data.theme) {{
+        const dark = e.data.theme === 'dark';
+        scene.background.setHex(dark ? 0x090d16 : 0xf8fafc);
+        floorMat.color.setHex(dark ? 0x131c31 : 0xf1f5f9);
+        wallMat.color.setHex(dark ? 0x1a2436 : 0xffffff);
+        if (dark) {{
+          document.body.classList.add('dark');
+        }} else {{
+          document.body.classList.remove('dark');
+        }}
+      }}
+    }});
+
     function animate() {{
       requestAnimationFrame(animate);
       controls.update();
@@ -645,7 +729,7 @@ def generate_3d_webgl_html(design: Dict[str, Any]) -> str:
 </body>
 </html>"""
     b64 = base64.b64encode(html_content.encode("utf-8")).decode("ascii")
-    return f'<iframe src="data:text/html;base64,{b64}" width="100%" height="460" style="border:none; border-radius:6px; display:block; background:#f8fafc;"></iframe>'
+    return f'<iframe src="data:text/html;base64,{b64}" width="100%" height="460" style="border:1px solid var(--border); border-radius:8px; display:block; background:var(--bg-card);"></iframe>'
 
 
 def generate_specs_table_html(design: Dict[str, Any]) -> str:
@@ -667,29 +751,29 @@ def generate_specs_table_html(design: Dict[str, Any]) -> str:
         sku = p.get("id", f"KOH-00{idx}")
         cat = p.get("category", "").title()
         rows.append(f"""
-        <tr style="border-bottom:1px solid #f1f5f9;">
-          <td style="padding:9px 12px; font-family:monospace; font-size:11px; color:#64748b;">{sku}</td>
-          <td style="padding:9px 12px; font-weight:500; color:#0f172a;">{p.get('name', 'Fixture')}</td>
-          <td style="padding:9px 12px; color:#475569;">{cat}</td>
-          <td style="padding:9px 12px; font-family:monospace; font-size:11px; color:#64748b;">{dim}</td>
-          <td style="padding:9px 12px; color:#334155;">{finish}</td>
-          <td style="padding:9px 12px; text-align:right; font-weight:600; color:#0f172a;">{price_str}</td>
+        <tr>
+          <td style="font-family:monospace; font-size:11px; color:var(--text-muted);">{sku}</td>
+          <td style="font-weight:500; color:var(--text-primary);">{p.get('name', 'Fixture')}</td>
+          <td style="color:var(--text-secondary);">{cat}</td>
+          <td style="font-family:monospace; font-size:11px; color:var(--text-muted);">{dim}</td>
+          <td style="color:var(--text-secondary);">{finish}</td>
+          <td style="text-align:right; font-weight:600; color:var(--text-primary);">{price_str}</td>
         </tr>
         """)
     rows_html = "".join(rows)
 
     return f"""
-    <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:6px; padding:16px; font-family:Inter,system-ui,sans-serif; font-size:12px; color:#0f172a;">
-      <div style="font-weight:600; font-size:13px; margin-bottom:10px; color:#0f172a;">Itemized Fixture Specifications</div>
-      <table style="width:100%; border-collapse:collapse; margin-bottom:16px;">
+    <div class="specs-card">
+      <div style="font-weight:600; font-size:13px; margin-bottom:10px; color:var(--text-primary);">Itemized Fixture Specifications</div>
+      <table class="specs-table">
         <thead>
-          <tr style="background:#f8fafc; border-bottom:1px solid #e5e7eb; color:#64748b; text-align:left; font-size:11px; text-transform:uppercase;">
-            <th style="padding:8px 12px;">SKU</th>
-            <th style="padding:8px 12px;">Fixture</th>
-            <th style="padding:8px 12px;">Category</th>
-            <th style="padding:8px 12px;">Dimensions</th>
-            <th style="padding:8px 12px;">Finish</th>
-            <th style="padding:8px 12px; text-align:right;">Price</th>
+          <tr>
+            <th>SKU</th>
+            <th>Fixture</th>
+            <th>Category</th>
+            <th>Dimensions</th>
+            <th>Finish</th>
+            <th style="text-align:right;">Price</th>
           </tr>
         </thead>
         <tbody>
@@ -698,36 +782,36 @@ def generate_specs_table_html(design: Dict[str, Any]) -> str:
       </table>
 
       <!-- Pricing Summary -->
-      <div style="background:#f8fafc; border:1px solid #e5e7eb; border-radius:6px; padding:12px 16px; margin-bottom:16px;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:4px; color:#475569;">
+      <div class="specs-summary-box">
+        <div class="specs-summary-row">
           <span>Catalog Subtotal:</span>
-          <span style="font-weight:500; color:#0f172a;">{format_inr(subtotal)}</span>
+          <span style="font-weight:500; color:var(--text-primary);">{format_inr(subtotal)}</span>
         </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:4px; color:#047857;">
+        <div class="specs-summary-row" style="color:#10b981; font-weight:500;">
           <span>Promotional Deal ({disc_tier}):</span>
           <span style="font-weight:600;">-{format_inr(disc_val)} ({disc_pct}% off)</span>
         </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:4px; color:#475569;">
+        <div class="specs-summary-row">
           <span>Net Taxable Amount:</span>
-          <span style="font-weight:500; color:#0f172a;">{format_inr(taxable)}</span>
+          <span style="font-weight:500; color:var(--text-primary);">{format_inr(taxable)}</span>
         </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:4px; color:#475569;">
+        <div class="specs-summary-row">
           <span>Estimated GST (18%):</span>
-          <span style="font-weight:500; color:#0f172a;">+{format_inr(gst)}</span>
+          <span style="font-weight:500; color:var(--text-primary);">+{format_inr(gst)}</span>
         </div>
-        <div style="border-top:1px solid #e2e8f0; margin-top:8px; padding-top:8px; display:flex; justify-content:space-between; font-size:13px; font-weight:600;">
-          <span style="color:#0f172a;">Final Grand Package Total:</span>
-          <span style="color:#0f172a;">{format_inr(grand_total)}</span>
+        <div class="specs-summary-total">
+          <span>Final Grand Package Total:</span>
+          <span style="color:var(--text-primary);">{format_inr(grand_total)}</span>
         </div>
       </div>
 
       <!-- Code Compliance Checklist -->
-      <div style="border:1px solid #e5e7eb; border-radius:6px; padding:12px 16px;">
-        <div style="font-weight:600; margin-bottom:6px; color:#0f172a;">Building Code & Sanitary Clearance Verification:</div>
-        <div style="color:#047857; margin-bottom:3px;">✓ <b>15" Centerline Clearance:</b> Pass — Toilet centerline placed ≥ 15" from adjacent walls/vanity.</div>
-        <div style="color:#047857; margin-bottom:3px;">✓ <b>21" Front Clearance:</b> Pass — Minimum 21" unobstructed front access verified for all fixtures.</div>
-        <div style="color:#047857; margin-bottom:3px;">✓ <b>30" Door Arc Swing:</b> Pass — Bathroom entrance door swings completely clear of fixtures.</div>
-        <div style="color:#047857;">✓ <b>Wet / Dry Zoning:</b> Pass — Enclosure glass isolates shower moisture from drywall.</div>
+      <div class="compliance-box">
+        <div style="font-weight:600; margin-bottom:6px; color:var(--text-primary);">Building Code &amp; Sanitary Clearance Verification:</div>
+        <div style="color:#10b981; margin-bottom:3px; font-size:12px;">✓ <b>15" Centerline Clearance:</b> Pass &mdash; Toilet centerline placed &ge; 15" from adjacent walls/vanity.</div>
+        <div style="color:#10b981; margin-bottom:3px; font-size:12px;">✓ <b>21" Front Clearance:</b> Pass &mdash; Minimum 21" unobstructed front access verified for all fixtures.</div>
+        <div style="color:#10b981; margin-bottom:3px; font-size:12px;">✓ <b>30" Door Arc Swing:</b> Pass &mdash; Bathroom entrance door swings completely clear of fixtures.</div>
+        <div style="color:#10b981; font-size:12px;">✓ <b>Wet / Dry Zoning:</b> Pass &mdash; Enclosure glass isolates shower moisture from drywall.</div>
       </div>
     </div>
     """
@@ -737,12 +821,12 @@ def render_studio_header(design: Dict[str, Any]) -> str:
     """Renders the minimal clean header for the Spatial Studio panel."""
     if not design:
         return """
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border:1px solid #e5e7eb; border-radius:6px; background:#f8fafc; font-family:Inter,system-ui,sans-serif; margin-bottom:12px;">
+        <div class="studio-header-card">
           <div>
-            <span style="font-size:13px; font-weight:600; color:#0f172a;">Spatial Studio</span>
-            <span style="font-size:12px; color:#64748b; margin-left:8px;">Ready for layout and space planning</span>
+            <span style="font-size:13px; font-weight:600; color:var(--text-primary);">Spatial Studio</span>
+            <span style="font-size:12px; color:var(--text-muted); margin-left:8px;">Ready for layout and space planning</span>
           </div>
-          <span style="background:#ffffff; border:1px solid #e2e8f0; color:#64748b; font-size:11px; padding:2px 8px; border-radius:4px;">No Active Plan</span>
+          <span style="background:var(--bg-muted); border:1px solid var(--border); color:var(--text-muted); font-size:11px; padding:2px 8px; border-radius:4px;">No Active Plan</span>
         </div>
         """
 
@@ -756,16 +840,16 @@ def render_studio_header(design: Dict[str, Any]) -> str:
     is_under = design.get("is_under_budget", True)
 
     badge_style = (
-        "background:#ecfdf5; color:#047857; border:1px solid #a7f3d0;" if is_under else
-        "background:#fef2f2; color:#b91c1c; border:1px solid #fecaca;"
+        "background:var(--badge-bg); color:var(--badge-text); border:1px solid var(--badge-border);" if is_under else
+        "background:rgba(239, 68, 68, 0.12); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.3);"
     )
     badge_label = f"Under Budget: {format_inr(grand_total)} / {format_inr(budget)}" if is_under else f"Over Budget: {format_inr(grand_total)} / {format_inr(budget)}"
 
     return f"""
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:12px 16px; border:1px solid #e5e7eb; border-radius:6px; background:#f8fafc; font-family:Inter,system-ui,sans-serif; margin-bottom:12px;">
+    <div class="studio-header-card">
       <div>
-        <span style="font-size:13px; font-weight:600; color:#0f172a;">{room_type}</span>
-        <span style="font-size:12px; color:#64748b; margin-left:8px;">{w:.1f}' × {l:.1f}' ({sqft:.1f} sq ft) • {finish}</span>
+        <span style="font-size:13px; font-weight:600; color:var(--text-primary);">{room_type}</span>
+        <span style="font-size:12px; color:var(--text-muted); margin-left:8px;">{w:.1f}' × {l:.1f}' ({sqft:.1f} sq ft) • {finish}</span>
       </div>
       <span style="{badge_style} font-size:11px; font-weight:500; padding:3px 8px; border-radius:4px;">{badge_label}</span>
     </div>
@@ -775,10 +859,10 @@ def get_default_views() -> Tuple[str, str, str, str]:
     """Returns placeholder views for initial application load."""
     default_header = render_studio_header({})
     empty_html = """
-    <div style="height:440px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; color:#64748b; font-family:Inter,system-ui,sans-serif; background:#f8fafc; border:1px solid #e5e7eb; border-radius:6px; padding:20px;">
-      <div style="font-weight:600; font-size:14px; color:#0f172a; margin-bottom:6px;">No Active Layout</div>
-      <div style="font-size:12px; max-width:320px; line-height:1.5;">
-        Ask the concierge to design a bathroom with dimensions and a budget, or select one of the quick actions on the left.
+    <div class="empty-view-card">
+      <div style="font-weight:600; font-size:14px; color:var(--text-primary); margin-bottom:6px;">No Active Layout</div>
+      <div style="font-size:12px; max-width:320px; line-height:1.5; color:var(--text-muted);">
+        Ask the concierge to design a bathroom with dimensions and a budget, or select one of the suggested prompts below.
       </div>
     </div>
     """
@@ -971,59 +1055,236 @@ def process_query(message: str, history: list, design_state: dict):
 
 
 # ==============================================================================
-# 8. MINIMALIST NOTION / LINEAR LIGHT-FIRST CSS
+# 8. MODERN SAAS LIGHT & DARK THEME CSS ARCHITECTURE
 # ==============================================================================
 
 MINIMAL_CSS = """
-/* Global Layout & Typography (Inter / System-UI) */
+/* Light Mode CSS Variables (Notion / Linear Clean Aesthetic) */
+:root {
+    --bg-app: #ffffff;
+    --bg-surface: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-muted: #f1f5f9;
+    --bg-pill: #f8fafc;
+    --bg-pill-hover: #f1f5f9;
+    --border: #e2e8f0;
+    --border-subtle: #f1f5f9;
+    --border-hover: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --accent: #0f172a;
+    --accent-hover: #1e293b;
+    --accent-text: #ffffff;
+    --bot-msg-bg: #ffffff;
+    --bot-msg-border: #e2e8f0;
+    --user-msg-bg: #f1f5f9;
+    --user-msg-border: #e2e8f0;
+    --input-bg: #ffffff;
+    --input-border: #e2e8f0;
+    --table-header-bg: #f8fafc;
+    --summary-bg: #f8fafc;
+    --badge-bg: #ecfdf5;
+    --badge-text: #047857;
+    --badge-border: #a7f3d0;
+}
+
+/* Dark Mode CSS Variables (Linear / Vercel Deep Obsidian Slate) */
+.dark, body.dark, html.dark, [data-theme="dark"] {
+    --bg-app: #090d16;
+    --bg-surface: #0f172a;
+    --bg-card: #131c31;
+    --bg-muted: #1e293b;
+    --bg-pill: #131c31;
+    --bg-pill-hover: #1e293b;
+    --border: #223049;
+    --border-subtle: #192338;
+    --border-hover: #334466;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #2563eb;
+    --accent-hover: #3b82f6;
+    --accent-text: #ffffff;
+    --bot-msg-bg: #131c31;
+    --bot-msg-border: #223049;
+    --user-msg-bg: #1e293b;
+    --user-msg-border: #2a3a55;
+    --input-bg: #131c31;
+    --input-border: #223049;
+    --table-header-bg: #0f172a;
+    --summary-bg: #0f172a;
+    --badge-bg: rgba(16, 185, 129, 0.15);
+    --badge-text: #34d399;
+    --badge-border: rgba(16, 185, 129, 0.3);
+}
+
+/* Global App Container */
 body, .gradio-container {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
+    background-color: var(--bg-app) !important;
+    color: var(--text-primary) !important;
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
     max-width: 1440px !important;
     margin: 0 auto !important;
+    transition: background-color 0.2s ease, color 0.2s ease !important;
 }
 
-/* Header Section */
-.app-header {
-    border-bottom: 1px solid #e5e7eb;
-    padding: 16px 0 18px 0;
-    margin-bottom: 18px;
+/* SaaS Title Bar (Linear / Vercel Reference) */
+#saas-titlebar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 10px 18px !important;
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    margin-bottom: 18px !important;
+    box-shadow: none !important;
+    min-height: 52px !important;
 }
-.app-header h1 {
-    font-size: 17px;
-    font-weight: 600;
-    color: #0f172a;
-    margin: 0 0 2px 0;
-    letter-spacing: -0.01em;
+
+#titlebar-left-container {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
 }
-.app-header p {
+
+.titlebar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 16px;
+}
+
+.titlebar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.brand-logo {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.titlebar-separator {
+    color: var(--border-hover);
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.titlebar-title {
     font-size: 13px;
-    color: #64748b;
-    margin: 0;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Chatbot Area */
-#chatbot-panel {
-    border: 1px solid #e5e7eb !important;
+.titlebar-badge {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    background-color: var(--bg-muted);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.titlebar-center {
+    display: flex;
+    align-items: center;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--bg-pill);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.status-pulse-dot {
+    width: 7px;
+    height: 7px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+#titlebar-actions {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    width: auto !important;
+}
+
+#titlebar-actions button {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 12px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
     border-radius: 6px !important;
-    background-color: #ffffff !important;
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    white-space: nowrap !important;
+}
+
+#titlebar-actions button:hover {
+    background-color: var(--bg-muted) !important;
+    border-color: var(--border-hover) !important;
+}
+
+/* Chatbot Panel & Bubbles */
+#chatbot-panel {
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    background-color: var(--bg-card) !important;
     box-shadow: none !important;
 }
 
-/* Chat Message Bubbles */
 #chatbot-panel [data-testid="user"], #chatbot-panel .message.user {
-    background-color: #f1f5f9 !important;
-    color: #0f172a !important;
-    border: 1px solid #e2e8f0 !important;
+    background-color: var(--user-msg-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--user-msg-border) !important;
     border-radius: 6px !important;
     box-shadow: none !important;
 }
 
 #chatbot-panel [data-testid="bot"], #chatbot-panel .message.bot {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    border: 1px solid #e5e7eb !important;
+    background-color: var(--bot-msg-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--bot-msg-border) !important;
     border-radius: 6px !important;
     box-shadow: none !important;
 }
@@ -1031,91 +1292,216 @@ body, .gradio-container {
 #chatbot-panel p, #chatbot-panel li {
     font-size: 13px !important;
     line-height: 1.55 !important;
+    color: var(--text-primary) !important;
+}
+
+#chatbot-panel strong {
+    color: var(--text-primary) !important;
 }
 
 #chatbot-panel h3 {
     font-size: 14px !important;
     font-weight: 600 !important;
-    color: #0f172a !important;
+    color: var(--text-primary) !important;
     margin: 6px 0 !important;
 }
 
-/* Input Fields */
+/* Chat Inputs */
 #input-box textarea, #input-box input {
-    border: 1px solid #e5e7eb !important;
+    border: 1px solid var(--input-border) !important;
     border-radius: 6px !important;
-    background: #ffffff !important;
-    color: #0f172a !important;
+    background: var(--input-bg) !important;
+    color: var(--text-primary) !important;
     box-shadow: none !important;
     font-size: 13px !important;
 }
 
 #input-box textarea:focus, #input-box input:focus {
-    border-color: #0f172a !important;
+    border-color: var(--accent) !important;
     box-shadow: none !important;
     outline: none !important;
 }
 
-/* Buttons */
 #send-btn {
-    background-color: #0f172a !important;
-    color: #ffffff !important;
-    border: 1px solid #0f172a !important;
+    background-color: var(--accent) !important;
+    color: var(--accent-text) !important;
+    border: 1px solid var(--accent) !important;
     border-radius: 6px !important;
     font-weight: 500 !important;
     font-size: 13px !important;
     box-shadow: none !important;
     cursor: pointer !important;
-}
-#send-btn:hover {
-    background-color: #1e293b !important;
+    transition: background-color 0.15s ease !important;
+    height: 40px !important;
 }
 
-.preset-btn {
-    background-color: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-    color: #334155 !important;
-    border-radius: 6px !important;
+#send-btn:hover {
+    background-color: var(--accent-hover) !important;
+}
+
+/* Minimalist Prompt Pills (Decluttered Suggested Queries) */
+#prompt-pills-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-top: 10px !important;
+    margin-bottom: 4px !important;
+    padding: 0 !important;
+}
+
+#prompt-pills-row button {
+    background-color: var(--bg-pill) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-secondary) !important;
+    border-radius: 9999px !important;
     font-size: 12px !important;
     font-weight: 500 !important;
-    padding: 3px 10px !important;
+    padding: 4px 12px !important;
     box-shadow: none !important;
     cursor: pointer !important;
-}
-.preset-btn:hover {
-    background-color: #f8fafc !important;
-    border-color: #cbd5e1 !important;
-    color: #0f172a !important;
+    transition: all 0.15s ease-in-out !important;
+    white-space: nowrap !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    min-width: 0 !important;
+    flex: 0 1 auto !important;
 }
 
-.clear-btn {
-    background-color: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-    color: #64748b !important;
-    border-radius: 6px !important;
-    font-size: 12px !important;
-    box-shadow: none !important;
-}
-.clear-btn:hover {
-    background-color: #f8fafc !important;
-    color: #0f172a !important;
+#prompt-pills-row button:hover {
+    background-color: var(--bg-pill-hover) !important;
+    border-color: var(--border-hover) !important;
+    color: var(--text-primary) !important;
+    transform: translateY(-1px);
 }
 
 /* Studio Tabs */
 .tab-nav {
-    border-bottom: 1px solid #e5e7eb !important;
+    border-bottom: 1px solid var(--border) !important;
+    background: transparent !important;
 }
+
 .tab-nav button {
     font-size: 13px !important;
     font-weight: 500 !important;
-    color: #64748b !important;
+    color: var(--text-muted) !important;
     border-radius: 0 !important;
     padding: 8px 16px !important;
     box-shadow: none !important;
+    background: transparent !important;
 }
+
 .tab-nav button.selected {
-    color: #0f172a !important;
-    border-bottom: 2px solid #0f172a !important;
+    color: var(--text-primary) !important;
+    border-bottom: 2px solid var(--accent) !important;
+    background: transparent !important;
+}
+
+.tabitem, .gradio-block, .gradio-box {
+    background-color: transparent !important;
+    border-color: var(--border) !important;
+}
+
+/* Studio Cards & Specifications */
+.studio-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--bg-card);
+    font-family: Inter, system-ui, sans-serif;
+    margin-bottom: 12px;
+}
+
+.specs-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 12px;
+    color: var(--text-primary);
+}
+
+.specs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+
+.specs-table thead tr {
+    background-color: var(--table-header-bg);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.specs-table tbody tr {
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.specs-table td {
+    padding: 9px 12px;
+}
+
+.specs-summary-box {
+    background-color: var(--summary-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+
+.specs-summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    color: var(--text-secondary);
+}
+
+.specs-summary-total {
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.compliance-box {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    background-color: var(--bg-card);
+}
+
+.empty-view-card {
+    height: 440px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--text-muted);
+    font-family: Inter, system-ui, sans-serif;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+@media (max-width: 900px) {
+    .titlebar-center {
+        display: none !important;
+    }
 }
 
 footer { display: none !important; }
@@ -1126,20 +1512,79 @@ footer { display: none !important; }
 # 9. GRADIO BLOCKS APPLICATION LAYOUT
 # ==============================================================================
 
+HEAD_JS = """
+<script>
+  window.toggleTheme = function() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    document.body.classList.toggle('dark', isDark);
+    try {
+      localStorage.setItem('kohler-theme', isDark ? 'dark' : 'light');
+    } catch(e) {}
+    
+    const btns = document.querySelectorAll('#theme-toggle-btn');
+    btns.forEach(b => {
+      const textSpan = b.querySelector('span') || b;
+      textSpan.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+    });
+
+    document.querySelectorAll('iframe').forEach(f => {
+      try {
+        f.contentWindow.postMessage({ theme: isDark ? 'dark' : 'light' }, '*');
+      } catch(err) {}
+    });
+  };
+
+  (function() {
+    let saved = null;
+    try {
+      saved = localStorage.getItem('kohler-theme');
+    } catch(e) {}
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = saved === 'dark' || (!saved && prefersDark);
+    if (shouldBeDark) {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+      window.addEventListener('DOMContentLoaded', () => {
+        const btns = document.querySelectorAll('#theme-toggle-btn');
+        btns.forEach(b => {
+          const textSpan = b.querySelector('span') || b;
+          textSpan.textContent = '☀️ Light';
+        });
+      });
+    }
+  })();
+</script>
+"""
+
 init_header, init_3d, init_2d, init_specs = get_default_views()
 
 with gr.Blocks(title="Kohler Design Concierge & Spatial Studio") as demo:
     design_state = gr.State(value={})
 
-    # Top Header
-    gr.HTML(
-        """
-        <div class="app-header">
-          <h1>Kohler Design Concierge & Spatial Studio</h1>
-          <p>Autonomous sales consultation, combo discount optimization, and architectural space planning.</p>
-        </div>
-        """
-    )
+    # Modern SaaS Title Bar (Linear / Vercel Reference)
+    with gr.Row(elem_id="saas-titlebar"):
+        gr.HTML(
+            """
+            <div class="titlebar-content">
+              <div class="titlebar-left">
+                <div class="brand-logo">KOHLER</div>
+                <span class="titlebar-separator">/</span>
+                <span class="titlebar-title">Design Concierge &amp; Spatial Studio</span>
+                <span class="titlebar-badge">v2.5 Studio</span>
+              </div>
+              <div class="titlebar-center">
+                <div class="status-pill">
+                  <span class="status-pulse-dot"></span>
+                  <span>Local RTX 4060 &bull; 100% Offline &bull; &#8377; INR</span>
+                </div>
+              </div>
+            </div>
+            """,
+            elem_id="titlebar-left-container"
+        )
+        with gr.Row(elem_id="titlebar-actions"):
+            theme_btn = gr.Button("🌙 Dark", elem_id="theme-toggle-btn", size="sm")
+            reset_btn = gr.Button("↺ Reset", elem_id="reset-btn", size="sm")
 
     # Main Two-Column Split Screen
     with gr.Row():
@@ -1163,12 +1608,12 @@ with gr.Blocks(title="Kohler Design Concierge & Spatial Studio") as demo:
                 )
                 send_btn = gr.Button("Send", variant="primary", scale=2, elem_id="send-btn")
 
-            with gr.Row():
-                btn_ex1 = gr.Button("8x6 Modern Bath", size="sm", elem_classes=["preset-btn"])
-                btn_ex2 = gr.Button("Purist Brass Suite", size="sm", elem_classes=["preset-btn"])
-                btn_ex3 = gr.Button("Numi 2.0 Specs", size="sm", elem_classes=["preset-btn"])
-                btn_ex4 = gr.Button("Zen Spa Master Bath", size="sm", elem_classes=["preset-btn"])
-                clear_btn = gr.Button("Clear", size="sm", elem_classes=["clear-btn"])
+            # Minimalist Prompt Pills (Decluttered Suggested Queries)
+            with gr.Row(elem_id="prompt-pills-row"):
+                btn_ex1 = gr.Button("✦ 8×6 Modern Bath", size="sm")
+                btn_ex2 = gr.Button("✦ Purist Brass Suite", size="sm")
+                btn_ex3 = gr.Button("✦ Numi 2.0 Specs", size="sm")
+                btn_ex4 = gr.Button("✦ Zen Spa Master Bath", size="sm")
 
         # Right Column (~55%): Spatial Studio Panel
         with gr.Column(scale=6, min_width=500):
@@ -1225,11 +1670,19 @@ with gr.Blocks(title="Kohler Design Concierge & Spatial Studio") as demo:
         outputs=[msg_input, chatbot, studio_header, view_3d, view_2d, view_specs, design_state]
     )
 
-    # Clear button
-    clear_btn.click(
+    # Reset button (in Title Bar)
+    reset_btn.click(
         lambda: ("", [], init_header, init_3d, init_2d, init_specs, {}),
         inputs=None,
         outputs=[msg_input, chatbot, studio_header, view_3d, view_2d, view_specs, design_state]
+    )
+
+    # Theme Toggle button (instant client-side execution)
+    theme_btn.click(
+        fn=None,
+        inputs=None,
+        outputs=None,
+        js="() => { if (typeof window.toggleTheme === 'function') window.toggleTheme(); }"
     )
 
 
@@ -1251,5 +1704,7 @@ if __name__ == "__main__":
         server_port=args.port,
         share=share_mode,
         theme=gr.themes.Base(),
-        css=MINIMAL_CSS
+        css=MINIMAL_CSS,
+        head=HEAD_JS
     )
+
