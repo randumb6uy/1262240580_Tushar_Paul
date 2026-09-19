@@ -1,179 +1,259 @@
-# 🛁 Kohler Autonomous AI Agent (INR Edition)
+# Kohler AI Sales & Spatial Design Advisor
 
-> **High-Performance Agentic AI with Zero API Costs ($0), Sub-Second RAG, Psychological Pricing (`₹xx,999`), and Consultative Sales Guidance.**
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![LlamaIndex](https://img.shields.io/badge/Orchestration-LlamaIndex%20v0.11%2B-orange.svg)](https://www.llamaindex.ai/)
+[![Vector DB](https://img.shields.io/badge/Vector%20Store-ChromaDB-green.svg)](https://www.trychroma.com/)
+[![Embeddings](https://img.shields.io/badge/Embeddings-BGE--Small--v1.5-blueviolet.svg)](https://huggingface.co/BAAI/bge-small-en-v1.5)
+[![UI](https://img.shields.io/badge/Frontend-Gradio-red.svg)](https://gradio.app/)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
 
-Built with **LlamaIndex Workflows**, **ChromaDB**, **Local BGE Embeddings**, **Cross-Encoder Reranking**, **Fast-Path Intent Routing**, and **Gradio**.
+An interactive AI design assistant and sales advisor that automates personalized product bundle recommendations for the **Kohler Luxury Bathroom Collection (India: INR)**.
+
+The system features **0ms Fast-Path Intent Routing**, **2-Stage Hybrid RAG (Vector Search + Cross-Encoder Reranking)**, **Spatial Studio & Constraint-Based Optimization**, **Multi-Item Package & GST Calculators**, and **Warehouse Fulfillment Tracking**, presented through a clean Gradio web interface.
 
 ---
 
-## ⚡ 60-Second Quickstart (Try It Now)
+## Key Features
 
-### Windows (1-Click)
-Double-click `run_demo.bat` or run in PowerShell:
-```cmd
-run_demo.bat
+- **Fast-Path Deterministic Router (0ms Overhead, Zero Tokens)**:
+  Instantly routes greetings, full catalog overviews, single-spec lookups, and multi-step tool calls without token usage or latency.
+- **Spatial Studio & Suite Optimizer (`bundle_optimizer`)**:
+  Takes bathroom dimensions (width x length), budget limits, aesthetic themes (Modern Minimalist, Classic Luxury, Japanese Zen, Mid-Century Luxury, Smart High-Tech), and fixture preferences to automate complete, budget-fitting Kohler packages with clearance compliance.
+- **Precision Pricing & Package Calculator (`price_and_package_calculator`)**:
+  Computes itemized quotes with subtotals, package discounts (15%), 18% GST, and budget variance in Indian Rupees (INR).
+- **Warehouse Inventory & Transit Checker (`inventory_and_delivery_checker`)**:
+  Provides fulfillment status, delivery lead times, and dispatch locations based on product type and delivery PIN/ZIP code.
+- **2-Stage Local Hybrid RAG (`kohler_catalog_search`)**:
+  Combines local BGE embeddings (`BAAI/bge-small-en-v1.5`) with a Cross-Encoder reranker (`ms-marco-MiniLM-L-6-v2`) and an in-memory LRU cache for 0ms repeated retrievals.
+- **Dual LLM Provider Support**:
+  - **100% Offline & Token-Free**: Local Ollama (`qwen2.5:3b` with GPU Flash Attention).
+  - **Cloud Ready**: Fallback to OpenRouter free or paid tiers.
+- **Self-Bootstrapping Gradio UI**:
+  Automatically creates and populates the ChromaDB vector database on startup if not present. Includes public demo link generation (`--share`).
+
+---
+
+## Mental Model: How the System Operates
+
+Think of this assistant as a **specialized luxury showroom advisor backed by four deterministic engines**:
+
+```
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 1. TRAFFIC CONTROLLER (Deterministic Router: 0ms, 0 Tokens)            │
+ │    Customer Intent Analysis                                            │
+ │    ├── Casual greeting -> Instant direct welcome                       │
+ │    ├── Catalog listing -> Instant structured INR portfolio table       │
+ │    ├── Single product  -> Fast-Path RAG (1 quick lookup)               │
+ │    └── Complex design  -> Full Autonomous Advisor Workflow             │
+ └──────────────────────────────────┬─────────────────────────────────────┘
+                                    │
+                                    ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 2. THE ADVISOR BRAIN (ReAct Orchestrator: LlamaIndex)                  │
+ │    Plans steps, calls tools in sequence, synthesizes final answers     │
+ └──────┬───────────────────┬──────────────────┬──────────────────┬───────┘
+        │                   │                  │                  │
+        ▼                   ▼                  ▼                  ▼
+ ┌───────────────┐   ┌───────────────┐  ┌──────────────┐   ┌──────────────┐
+ │ Spatial Studio│   │ RAG Search    │  │ Calculator   │   │ Logistics    │
+ │ Room Planner  │   │ ChromaDB +    │  │ Exact math,  │   │ Real-time    │
+ │ & Clearances  │   │ Cross-Encoder │  │ 15% disc,    │   │ stock & ZIP  │
+ │ Validator     │   │ Reranker      │  │ 18% GST INR  │   │ transit days │
+ └───────────────┘   └───────────────┘  └──────────────┘   └──────────────┘
 ```
 
-### macOS / Linux (1-Command)
-```bash
-chmod +x run_demo.sh
-./run_demo.sh
+### Architecture Comparison
+
+| Layer | Traditional AI Pitfall | Our Solution & Mental Model |
+| :--- | :--- | :--- |
+| **1. Intent Routing** | Wastes 2 to 5s and paid LLM tokens on greetings or basic queries | **0ms Deterministic Bypass**: Regex & keyword matching bypasses LLMs entirely for deterministic answers. |
+| **2. Spatial Design** | LLMs hallucinate dimensions and recommend oversized bathtubs in small powder rooms. | **Deterministic Constraint & Clearance Rule Engine**: Computes exact fixture capacity and checks mandatory building code clearances (15" centerline, 21"-30" aisle). |
+| **3. Pricing & Tax** | LLMs make arithmetic errors and hallucinate package discounts and taxes. | **Deterministic Math Engine**: LLM delegates all math to Python (`calculator.py`) calculating subtotals, tier discounts, and 18% GST in INR. |
+| **4. Product Search** | Plain vector search misses specific model codes or exact finish names. | **2-Stage Hybrid RAG**: Fast BGE embedding vector search filtered and precision-reranked via Cross-Encoder with LRU cache. |
+
+---
+
+## Architecture & Query Lifecycle
+
+```mermaid
+flowchart TD
+    User["Customer Query / Studio Inputs"] --> Router{"Deterministic Router<br/>(0ms, 0 Tokens)"}
+
+    Router -->|"Pure Greeting"| DirectGreeting["Sales Advisor Direct Reply<br/>(Spotlights & Recommendations)"]
+    Router -->|"Catalog Request"| CatalogOverview["Instant Portfolio Overview<br/>(Structured INR pricing)"]
+    Router -->|"Single Product Specs"| FastPath["Fast-Path RAG Engine<br/>(Chroma Vector + Cross-Encoder Reranker)"]
+    Router -->|"Suite Planning / Quotes / Inventory"| AgenticWorkflow["Autonomous Advisor Workflow<br/>(ReAct Multi-Tool Calling)"]
+
+    AgenticWorkflow --> Tool1["bundle_optimizer / room_planner<br/>(Clearances & Fixture Capacities)"]
+    AgenticWorkflow --> Tool2["kohler_catalog_search<br/>(2-Stage Reranked Retrieval)"]
+    AgenticWorkflow --> Tool3["price_and_package_calculator<br/>(Discounts, Subtotals & 18% GST)"]
+    AgenticWorkflow --> Tool4["inventory_and_delivery_checker<br/>(Stock & Transit Times)"]
+
+    DirectGreeting --> GradioUI["Gradio Web Application"]
+    CatalogOverview --> GradioUI
+    FastPath --> GradioUI
+    Tool1 --> AgenticWorkflow
+    Tool2 --> AgenticWorkflow
+    Tool3 --> AgenticWorkflow
+    Tool4 --> AgenticWorkflow
+    AgenticWorkflow --> GradioUI
 ```
 
-### Manual Setup
+---
+
+## Quick Start
+
+### 1. Prerequisites
+- **Python 3.10+** (Python 3.12 recommended)
+- **Git**
+- *(Optional for 100% offline mode)* [Ollama](https://ollama.com/) with `ollama pull qwen2.5:3b`
+
+### 2. Clone the Repository
 ```bash
-# 1. Clone repo and checkout agentic branch
-git clone https://github.com/randumb6uy/RAG-Project.git
+git clone https://github.com/<your-username>/RAG-Project.git
 cd RAG-Project
-git checkout agentic-ai
-
-# 2. Setup environment
-python -m venv .venv
-# On Windows: .venv\Scripts\activate | On Mac/Linux: source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-
-# 3. Launch Web App (Local + Public Shareable Link)
-python app.py --share
 ```
-Open **`http://localhost:7860`** in your browser. *(On first run, it auto-indexes `docs/products.jsonl` in ~1.5s)*.
+
+### 3. Create & Activate Virtual Environment
+```bash
+# Windows
+python -m venv .venv
+.venv\Scripts\activate
+
+# Linux / macOS
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 4. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Configure Environment Variables
+Copy `.env.example` to `.env`:
+```bash
+# Windows
+copy .env.example .env
+
+# Linux / macOS
+cp .env.example .env
+```
+
+Edit `.env` to configure your preferred LLM provider:
+```ini
+# Option A: 100% Local & Token-Free via Ollama
+LLM_PROVIDER=ollama
+AGENT_MODEL=qwen2.5:3b
+
+# Option B: Cloud via OpenRouter (Automatic fallback if Ollama is not running)
+OPENROUTER_API_KEY=sk-or-v1-...
+OPENROUTER_MODEL=nvidia/nemotron-3.5-lightning:free
+```
+
+### 6. Launch the Gradio Web Application
+```bash
+# Launch directly
+python app.py
+
+# Or use the quick-launch scripts
+run_demo.bat     # Windows
+./run_demo.sh    # Linux / macOS
+```
+Open **http://localhost:7860** in your browser.
+
+> **Public Sharing**: Run `python app.py --share` or set `SHARE_PROTOTYPE=true` in `.env` to generate a public 72-hour temporary URL for live client demonstrations.
 
 ---
 
-## 🌟 Key Innovations
+## Example Queries & Capabilities
 
-1. **⚡ Fast-Path Intent Router (`router.py`):**
-   - **0ms overhead, 0-token deterministic classification.**
-   - Routes simple queries straight to a fused **ChromaDB + Cross-Encoder** 1-step retrieval, cutting response latency by **~75%** compared to traditional multi-turn ReAct agents.
-   - Routes greetings and slang instantly without querying the catalog.
-2. **💰 Native Indian Rupee (`₹xx,999`) Psychological Pricing:**
-   - All catalog products are converted at ₹83.50/USD, rounded to the nearest multiple of 1,000, and reduced by 1 (e.g. *₹14,999*, *₹34,999*, *₹15,999*).
-3. **🤝 Consultative Sales Persona with Slang Fluency:**
-   - Naturally understands and matches casual language (`yo`, `ye wassup`, `sup bro`, `hey`).
-   - Acts as a dedicated *Kohler Design & Purchasing Specialist*, introducing flagship collections (*Numi 2.0 & Veil smart toilets*, *Moxie Bluetooth showerheads*, *Purist faucets*) and discovering customer renovation goals.
-4. **🧠 Autonomous Multi-Step Tool Calling (ReAct):**
-   - Chains multiple tools for complex workflows: retrieves catalog prices, calculates multi-item bundle quotes with percentage discounts and GST, and checks live warehouse logistics.
-5. **💸 100% Token-Free & Offline ($0 API Costs):**
-   - **Embeddings:** `BAAI/bge-small-en-v1.5` (100% local CPU).
-   - **Reranker:** `cross-encoder/ms-marco-MiniLM-L-6-v2` (100% local CPU).
-   - **LLM:** Runs on local **Ollama** (`qwen2.5:3b` with GPU acceleration) or free cloud fallback (**OpenRouter**).
+Try these prompts in the Gradio UI:
+
+| Category | Example Prompt | Active Route & Tools |
+| :--- | :--- | :--- |
+| **Catalog Exploration** | *"Show me the catalogue and all product categories."* | Portfolio Overview |
+| **Compact Powder Room** | *"I have a 4x5 ft powder room, what products will fit nicely without looking cramped?"* | Room Layout Planner |
+| **Master Bath Suite** | *"Plan a luxury 10x10 ft master bathroom suite with the best Kohler products."* | Spatial Studio & Suite Optimizer |
+| **Fixture Clearances** | *"What is the minimum and maximum number of products I can fit into a 7x7 ft bathroom while keeping it pleasing?"* | Room Layout Planner |
+| **Specific Specs & Finish** | *"What finishes and dimensions are available for the Purist faucet?"* | Fast-Path Catalog Search |
+| **Multi-Item Quote + Tax** | *"What would the Moxie Bluetooth showerhead cost with a 15% discount and 18% GST?"* | Price & Package Calculator |
+| **Inventory & Logistics** | *"Do you have the Veil intelligent toilet in stock for delivery to PIN 400001?"* | Inventory & Delivery Checker |
 
 ---
 
-## 📊 Live Benchmark & Evaluation Results
+## Testing & Verification
 
-Tested against 7 diverse real-world customer queries using [`test_suite.py`](test_suite.py) on a local RTX 4060 GPU:
+The repository includes automated test suites and benchmarking tools:
 
-| # | Query Category | User Input | Route | Tools Used | Latency | Accuracy |
-|---|---|---|---|---|:---:|:---:|
-| **1** | **General Slang** | *"yo"* | `[Direct]` Conversation | *None* | **1.1 s** | 100% |
-| **2** | **Product Specs & Finish** | *"What finishes, dimensions, and price in INR are available for the Purist faucet?"* | `[Fast-Path]` 1-Step RAG | *Fused BGE + Reranker* | **1.5 s** | 100% (₹34,999) |
-| **3** | **High-Tech Specs** | *"Tell me about the Numi 2.0 smart toilet and what luxury features it includes."* | `[Fast-Path]` 1-Step RAG | *Fused BGE + Reranker* | **1.4 s** | 100% |
-| **4** | **Multi-Step Quote & GST** | *"What is the price of the Moxie Bluetooth showerhead in INR, and what would it cost with a 20% discount and 18% GST?"* | `[Agent]` Multi-Step ReAct | `catalog_search` → `price_calculator` | **2.7 s** | 100% (₹15,093.06) |
-| **5** | **Live Inventory & Shipping** | *"Do you have the Veil intelligent toilet in stock, and how long does delivery take to ZIP 90210?"* | `[Agent]` Multi-Step ReAct | `inventory_checker` | **1.1 s** | 100% |
-| **6** | **Multi-Product Bundle** | *"How much would it cost to buy both the Veer faucet and the Poplin vanity together in INR?"* | `[Fast-Path]` 1-Step RAG | *Fused Context Math* | **1.1 s** | 100% (₹57,998) |
-| **7** | **Out-of-Catalog Guardrail** | *"Do you sell Kohler kitchen refrigerators or dishwashers?"* | `[Fast-Path]` 1-Step RAG | *Context Guardrail* | **0.6 s** | Safe Fallback |
-
-To re-run these benchmarks locally on your machine:
+### Automated 12-Scenario Test Suite
+Runs an end-to-end evaluation across greetings, spatial sizing, calculations, inventory, and out-of-catalog boundary checks:
 ```bash
 python test_suite.py
 ```
 
----
-
-## 🏗️ Architecture & Workflow
-
-```mermaid
-flowchart TD
-    User([👤 User Query]) --> Router{⚡ Intent Router<br/>router.py}
-    
-    Router -->|Greetings & Slang<br/>'yo', 'hello', 'sup'| Direct[Direct Sales Specialist<br/>Proactive Kohler Lead Generation]
-    Router -->|Product Specs & Finishes<br/>Dimensions, Models| FastPath[Fast-Path RAG<br/>ChromaDB + BGE Embeddings<br/>+ Cross-Encoder Reranker]
-    Router -->|Math, Discounts, Packages,<br/>Inventory, Shipping| Agentic[AgentWorkflow ReAct Loop]
-    
-    Agentic --> Tool1[(🔍 kohler_catalog_search<br/>LRU Cached Chroma Index)]
-    Agentic --> Tool2[(🧮 price_and_package_calculator<br/>INR Math + Discounts + GST)]
-    Agentic --> Tool3[(📦 inventory_and_delivery_checker<br/>Warehouse Stock & Lead Time)]
-    
-    Direct --> Output([💬 Clean Chatbox Response])
-    FastPath --> Output
-    Tool1 --> Agentic
-    Tool2 --> Agentic
-    Tool3 --> Agentic
-    Agentic --> Output
-```
-
----
-
-## 🛠️ Specialized Tool Suite (`tools/`)
-
-| Tool Name | File | Description |
-|---|---|---|
-| **`kohler_catalog_search`** | [`tools/catalog.py`](tools/catalog.py) | Two-stage retrieval over atomic JSONL product records with in-memory LRU caching (0ms for repeat lookups). |
-| **`price_and_package_calculator`** | [`tools/calculator.py`](tools/calculator.py) | High-precision arithmetic engine for multi-product packages, coupon discounts, and GST quotes in `₹` (INR). |
-| **`inventory_and_delivery_checker`** | [`tools/inventory.py`](tools/inventory.py) | Live warehouse inventory lookup and transit lead-time calculation by regional ZIP / PIN code. |
-
----
-
-## 📴 Choosing Your LLM Provider
-
-### Option A: 100% Offline (Ollama - Recommended)
-Run completely offline with zero API keys and zero cost:
-1. Install [Ollama](https://ollama.com).
-2. Download model:
-   ```bash
-   ollama run qwen2.5:3b
-   ```
-3. Set in `.env`:
-   ```env
-   LLM_PROVIDER=ollama
-   AGENT_MODEL=qwen2.5:3b
-   ```
-
-### Option B: Cloud Free-Tier (OpenRouter)
-If you don't have a local GPU:
-1. Get a free API key at [openrouter.ai](https://openrouter.ai/).
-2. Set in `.env`:
-   ```env
-   LLM_PROVIDER=openrouter
-   OPENROUTER_API_KEY=your_key_here
-   AGENT_MODEL=nvidia/nemotron-3.5-lightning:free
-   ```
-
----
-
-## 🐳 Docker Deployment
-
-To launch as a containerized microservice:
+### Interactive Terminal CLI
+Test the autonomous advisor in a fast, lightweight terminal loop:
 ```bash
-docker compose up --build
+python query.py
 ```
-Access the application at `http://localhost:7860`.
+
+### Multi-Provider Benchmark
+Compare latency, tool accuracy, and response quality across local and cloud models:
+```bash
+python compare_providers.py
+```
 
 ---
 
-## 📂 Repository Structure
+## Docker Deployment
 
-```text
+To build and run the application in a lightweight container:
+
+```bash
+# Build and run with Docker Compose
+docker compose up --build -d
+
+# View logs
+docker compose logs -f
+```
+Access the application at **http://localhost:7860**.
+
+---
+
+## Project Structure
+
+```
 RAG-Project/
-├── app.py                   # Gradio web application (clean output interface)
-├── agent.py                 # Autonomous AgentWorkflow & smart query dispatcher
-├── router.py                # Deterministic intent classifier (0ms overhead)
-├── ingest.py                # ChromaDB vector index builder with local BGE
-├── test_suite.py            # Comprehensive 7-test empirical benchmark runner
-├── run_demo.bat             # 1-click Windows setup and launch script
-├── run_demo.sh              # 1-click Linux/macOS setup and launch script
-├── requirements.txt         # Pinned Python package dependencies
-├── .env.example             # Environment configuration template
 ├── docs/
-│   └── products.jsonl       # High-speed compact atomic product catalog
-└── tools/
-    ├── catalog.py           # Cached ChromaDB + Cross-Encoder retrieval tool
-    ├── calculator.py        # Itemized package & GST calculator tool
-    └── inventory.py         # Warehouse stock & shipping checker tool
+│   └── products.jsonl        # 30+ structured Kohler luxury product records in INR
+├── tools/
+│   ├── __init__.py           # Tool exports and registry
+│   ├── bundle_optimizer.py   # Constraint-based suite optimizer & financial engine
+│   ├── catalog.py            # 2-Stage ChromaDB + Cross-Encoder retrieval tool
+│   ├── room_planner.py       # Spatial layout, clearances & fixture capacity tool
+│   ├── calculator.py         # Subtotal, discount & 18% GST quotation tool
+│   └── inventory.py          # Real-time stock status & delivery lead time tool
+├── app.py                    # Polished Gradio Web UI with Spatial Studio & AI Advisor
+├── agent.py                  # LlamaIndex AgentWorkflow & Hybrid Routing orchestrator
+├── router.py                 # Deterministic 0ms intent classifier
+├── ingest.py                 # Self-bootstrapping ChromaDB vector store indexer
+├── query.py                  # Interactive CLI assistant for terminal testing
+├── test_suite.py             # 12-test automated evaluation & verification suite
+├── compare_providers.py      # LLM provider benchmark matrix
+├── Modelfile                 # Custom Ollama Modelfile with spatial system prompt
+├── requirements.txt          # Production-ready Python dependencies
+├── .env.example              # Environment variables template
+├── .gitignore                # Comprehensive Git ignore rules
+├── run_demo.bat              # One-click Windows startup script
+├── run_demo.sh               # One-click Linux/macOS startup script
+├── Dockerfile                # Production Docker container image
+├── docker-compose.yml        # Multi-platform container configuration
+└── README.md                 # Project documentation
 ```
 
 ---
 
-## 📜 License
-MIT License. Free for educational and commercial use.
+## License
+
+This project is licensed under the MIT License: see the [LICENSE](LICENSE) file for details.

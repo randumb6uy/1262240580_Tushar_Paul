@@ -1,10 +1,5 @@
 FROM python:3.12-slim
 
-# Prevent python from writing pyc files and buffering stdout
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV HF_HUB_DISABLE_SYMLINKS_WARNING=1
-
 WORKDIR /app
 
 # Install system dependencies
@@ -13,15 +8,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Copy requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application source code and catalog documents
+# Pre-download Hugging Face embedding & reranker models for offline readiness
+RUN python -c "from llama_index.embeddings.huggingface import HuggingFaceEmbedding; HuggingFaceEmbedding(model_name='BAAI/bge-small-en-v1.5')"
+RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
+
+# Copy application files
 COPY . .
 
 # Expose Gradio port
 EXPOSE 7860
 
-# Launch prototype
-CMD ["python", "app.py"]
+ENV PYTHONUNBUFFERED=1
+ENV HF_HUB_OFFLINE=1
+ENV TRANSFORMERS_OFFLINE=1
+
+CMD ["python", "app.py", "--port", "7860"]

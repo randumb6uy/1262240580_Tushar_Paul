@@ -1,47 +1,32 @@
 @echo off
 setlocal enabledelayedexpansion
-title Kohler Autonomous AI Agent - Setup & Launch
+title Kohler AI Sales Assistant & Spatial Studio
 
-echo ===============================================================================
-echo   KOHLER AUTONOMOUS AI AGENT - RAPID DEMO LAUNCHER
-echo   Zero API Cost ^| Sub-Second Latency ^| INR Psychological Pricing (₹xx,999)
-echo ===============================================================================
+echo =====================================================================
+echo  Kohler AI Sales Assistant & Spatial Studio (Gradio UI)
+echo =====================================================================
 echo.
 
-:: 1. Check Python
-python --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] Python is not installed or not in your PATH.
-    echo Please install Python 3.10+ from https://www.python.org/
-    pause
-    exit /b 1
-)
-
-:: 2. Check/Create Virtual Environment
-if not exist ".venv" (
-    echo [1/4] Creating isolated virtual environment in .venv...
-    python -m venv .venv
-)
-
-call .venv\Scripts\activate.bat
-
-:: 3. Check/Install Requirements
-echo [2/4] Verifying dependencies...
-pip install -r requirements.txt --quiet --disable-pip-version-check
-
-:: 4. Check .env configuration
-if not exist ".env" (
-    echo [3/4] Initializing .env configuration from template...
-    copy .env.example .env >nul
-    echo       Created .env with default offline Ollama configuration.
+:: 1. Activate Python virtual environment if present
+if exist ".venv\Scripts\activate.bat" (
+    echo [OK] Activating virtual environment (.venv)...
+    call .venv\Scripts\activate.bat
+) else if exist "venv\Scripts\activate.bat" (
+    echo [OK] Activating virtual environment (venv)...
+    call venv\Scripts\activate.bat
 ) else (
-    echo [3/4] Found existing .env configuration.
+    echo [Info] Using system Python environment...
 )
 
-:: 5. Launch Prototype
-echo [4/4] Starting Kohler Autonomous Agent Prototype...
-echo       - Local Web UI: http://localhost:7860
+:: 2. Check if .env exists, if not copy from .env.example
+if not exist ".env" (
+    echo [Setup] Creating .env from .env.example...
+    copy .env.example .env
+)
+
+:: 3. Launch Gradio App
 echo.
-python app.py --share
+echo [Launch] Starting Gradio web server at http://localhost:7860 ...
+python app.py %*
 
 pause

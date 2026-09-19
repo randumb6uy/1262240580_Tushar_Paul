@@ -17,68 +17,87 @@ os.environ["TRANSFORMERS_OFFLINE"] = "1"
 load_dotenv()
 
 from agent import create_agent, smart_process_query
-from llama_index.core.workflow import Context
 
-TEST_QUESTIONS = [
-    # 1. General greeting & capabilities
+COMPREHENSIVE_TEST_SUITE = [
+    # 1. Pure greeting & capabilities
     {
-        "category": "General Conversation",
+        "category": "1. Pure Greeting & Brand Introduction",
         "question": "Hello! Who are you and what Kohler products can you help me with?",
     },
-    # 2. Specific product specs & pricing (Fast-Path)
+    # 2. Mixed greeting with buying intent
     {
-        "category": "Specific Faucet Specs & Finish (INR)",
+        "category": "2. Mixed Greeting + Buying Intent",
+        "question": "Hello, I would like to buy something for my bathroom renovation.",
+    },
+    # 3. Catalog Discovery & Category Browsing
+    {
+        "category": "3. Full Catalog Discovery",
+        "question": "Show me the catalogue and all available product categories.",
+    },
+    # 4. Custom Room Size: Compact Powder Room (4x5 ft)
+    {
+        "category": "4. Spatial Fit: Compact Powder Room (4x5 ft)",
+        "question": "I have a 4x5 ft powder room, what products will fit nicely without looking cramped?",
+    },
+    # 5. Custom Room Size: Standard Full Bath (6x8 ft)
+    {
+        "category": "5. Spatial Fit: Standard Bath (6x8 ft)",
+        "question": "What is the best aesthetic setup and fixture layout for a 6x8 ft bathroom?",
+    },
+    # 6. Custom Room Size: Grand Master Suite (10x10 ft)
+    {
+        "category": "6. Spatial Fit: Grand Master Suite (10x10 ft)",
+        "question": "Plan a luxury 10x10 ft master bathroom suite with the best Kohler products.",
+    },
+    # 7. Minimum vs Maximum Product Fit in Custom Space
+    {
+        "category": "7. Minimum vs Maximum Pleasing Product Capacity",
+        "question": "What is the minimum and maximum number of products I can fit into a 7x7 ft bathroom while keeping it pleasing?",
+    },
+    # 8. Long Output Proposal with Multi-Tool Math & Clearance Analysis
+    {
+        "category": "8. Long Output Proposal (Layout + Clearances + 15% Discount + 18% GST)",
+        "question": "Provide a complete master bathroom remodel proposal for a 10x10 ft space with fixture dimensions, clearances, a 15% package discount, and 18% GST calculated.",
+    },
+    # 9. Specific product specs & finishes (Fast-Path)
+    {
+        "category": "9. Specific Product Specs & Finish (Purist)",
         "question": "What finishes, dimensions, and price in INR are available for the Purist faucet?",
     },
-    # 3. High-tech smart toilet specifications (Fast-Path)
+    # 10. Multi-step calculation with discount & tax (Agentic)
     {
-        "category": "Specific Smart Toilet Features (INR)",
-        "question": "Tell me about the Numi 2.0 smart toilet and what luxury features it includes.",
-    },
-    # 4. Multi-hop tool calculation: Product + Discount + Tax (Agentic)
-    {
-        "category": "Multi-Step Calculation & Quote (INR & GST)",
+        "category": "10. Multi-Step Calculation & Quote (Moxie + 20% + 18% GST)",
         "question": "What is the price of the Moxie Bluetooth showerhead in INR, and what would it cost with a 20% discount and 18% GST?",
     },
-    # 5. Inventory & Shipping estimate (Agentic)
+    # 11. Inventory & logistics lead time
     {
-        "category": "Inventory & Logistics",
+        "category": "11. Inventory & Delivery Transit Time",
         "question": "Do you have the Veil intelligent toilet in stock, and how long does delivery take to ZIP 90210?",
     },
-    # 6. Multi-product bundle quote across categories (Agentic / Fast-Path)
+    # 12. Out-of-catalog boundary check
     {
-        "category": "Multi-Product Package Quote (INR)",
-        "question": "How much would it cost to buy both the Veer faucet and the Poplin vanity together in INR?",
-    },
-    # 7. Out-of-Catalog boundary check
-    {
-        "category": "Out-of-Catalog Boundary Test",
+        "category": "12. Out-of-Catalog Boundary Check",
         "question": "Do you sell Kohler kitchen refrigerators or dishwashers?",
-    },
-    # 8. Aesthetic matching & coordinated combo discount
-    {
-        "category": "Aesthetic Finish Matching & Combo Discount",
-        "question": "Can you recommend a matching faucet and vanity package for a modern bathroom, and what combo discount do I get?",
     },
 ]
 
 async def run_test_suite():
-    print("================================================================================")
-    print(" [TEST SUITE] RUNNING COMPREHENSIVE QUESTION EVALUATION")
-    print("================================================================================\n")
+    print("================================================================================", flush=True)
+    print(" [TEST SUITE] RUNNING EXPANDED COMPREHENSIVE QUESTION EVALUATION (12 TESTS)", flush=True)
+    print("================================================================================\n", flush=True)
     
     agent = create_agent()
-    ctx = Context(agent)
-    
     results = []
 
-    for idx, item in enumerate(TEST_QUESTIONS, 1):
+    for idx, item in enumerate(COMPREHENSIVE_TEST_SUITE, 1):
         cat = item["category"]
         q = item["question"]
-        print(f"\n--- [Test {idx}/{len(TEST_QUESTIONS)}: {cat}] ---")
-        print(f"Question: \"{q}\"")
+        print(f"\n--- [Test {idx}/12: {cat}] ---", flush=True)
+        print(f"Question: \"{q}\"", flush=True)
         
+        ctx = None
         t0 = time.perf_counter()
+
         route_badge = "Unknown"
         tools_called = []
         final_answer = ""
@@ -87,17 +106,17 @@ async def run_test_suite():
             u_type = update.get("type")
             if u_type == "route":
                 route_badge = update.get("badge", "")
-                print(f"  Route: {route_badge}")
+                print(f"  Route: {route_badge}", flush=True)
             elif u_type == "tool_call":
                 call_str = f"{update.get('name')}({update.get('args', '')})"
                 tools_called.append(call_str)
-                print(f"  -> Tool Call: {call_str}")
+                print(f"  -> Tool Call: {call_str}", flush=True)
             elif u_type == "final":
                 final_answer = update.get("content", "")
 
         elapsed = time.perf_counter() - t0
-        print(f"  Latency: {elapsed:.2f} s")
-        print(f"  Answer Preview: {final_answer[:140].strip()}...\n")
+        print(f"  Latency: {elapsed:.2f} s", flush=True)
+        print(f"  Answer Preview:\n{final_answer[:220].strip()}...\n", flush=True)
         
         results.append({
             "index": idx,
@@ -109,16 +128,16 @@ async def run_test_suite():
             "answer": final_answer.strip(),
         })
 
-    print("\n================================================================================")
-    print(" [SUMMARY OF ALL TEST RESULTS]")
-    print("================================================================================")
+    print("\n================================================================================", flush=True)
+    print(" [SUMMARY OF ALL 12 TEST EVALUATION RESULTS]", flush=True)
+    print("================================================================================", flush=True)
     for r in results:
-        tools_str = ", ".join(r["tools"]) if r["tools"] else "None (Direct/1-step)"
-        print(f"\n[#{r['index']}] Category: {r['category']}")
-        print(f"Q: {r['question']}")
-        print(f"Route: {r['route']} | Latency: {r['latency']:.2f}s | Tools: {tools_str}")
-        print(f"Answer:\n{r['answer']}")
-        print("-" * 80)
+        tools_str = ", ".join(r["tools"]) if r["tools"] else "None (Direct/Catalog/1-step)"
+        print(f"\n[#{r['index']}] Category: {r['category']}", flush=True)
+        print(f"Q: {r['question']}", flush=True)
+        print(f"Route: {r['route']} | Latency: {r['latency']:.2f}s | Tools: {tools_str}", flush=True)
+        print(f"Answer:\n{r['answer']}", flush=True)
+        print("-" * 80, flush=True)
 
 if __name__ == "__main__":
     asyncio.run(run_test_suite())

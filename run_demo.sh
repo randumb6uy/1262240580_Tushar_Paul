@@ -1,38 +1,27 @@
 #!/usr/bin/env bash
 set -e
 
-echo "==============================================================================="
-echo "  KOHLER AUTONOMOUS AI AGENT - RAPID DEMO LAUNCHER"
-echo "  Zero API Cost | Sub-Second Latency | INR Psychological Pricing (₹xx,999)"
-echo "==============================================================================="
+echo "====================================================================="
+echo " Kohler AI Sales Assistant & Spatial Studio (Gradio UI)"
+echo "====================================================================="
 echo ""
 
-# 1. Check Python
-if ! command -v python3 &>/dev/null; then
-    echo "[ERROR] python3 is not installed or not in your PATH."
-    exit 1
+# 1. Activate Python virtual environment if present
+if [ -d ".venv" ]; then
+    echo "[OK] Activating virtual environment (.venv)..."
+    source .venv/bin/activate
+elif [ -d "venv" ]; then
+    echo "[OK] Activating virtual environment (venv)..."
+    source venv/bin/activate
 fi
 
-# 2. Check/Create Virtual Environment
-if [ ! -d ".venv" ]; then
-    echo "[1/4] Creating virtual environment in .venv..."
-    python3 -m venv .venv
-fi
-
-source .venv/bin/activate
-
-# 3. Verify Dependencies
-echo "[2/4] Verifying dependencies..."
-pip install -r requirements.txt --quiet --disable-pip-version-check
-
-# 4. Check .env
+# 2. Check if .env exists, if not copy from .env.example
 if [ ! -f ".env" ]; then
-    echo "[3/4] Creating .env from template..."
+    echo "[Setup] Creating .env from .env.example..."
     cp .env.example .env
 fi
 
-# 5. Launch Prototype
-echo "[4/4] Launching Gradio Prototype..."
-echo "      Local UI: http://localhost:7860"
+# 3. Launch Gradio App
 echo ""
-python3 app.py --share
+echo "[Launch] Starting Gradio web server at http://localhost:7860 ..."
+python app.py "$@"

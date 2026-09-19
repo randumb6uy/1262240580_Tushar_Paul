@@ -1,10 +1,57 @@
-.env
-chroma_db/
-__pycache__/
-*.pyc
+# Python & Virtual Environments
 .venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Secrets & Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Vector Store & AI Caches
+chroma_db/
 .gradio/
-frontend/node_modules/
-frontend/dist/
-frontend/.nitro/
+.cache/
+hf_cache/
+
+# Testing & Linting
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# OS Artifacts & Installers
+.DS_Store
+Thumbs.db
+*.torrent
+desktop.ini
+*.tmp
+*.msi
+*.exe
+
+# Large Archives & Workspace Artifacts
 *.zip
+*.tar.gz
+Prod_demo/

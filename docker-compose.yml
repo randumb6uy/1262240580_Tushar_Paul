@@ -1,21 +1,15 @@
-version: "3.8"
-
 services:
-  kohler-agent:
+  kohler-assistant:
     build: .
-    container_name: kohler-agent-prototype
+    container_name: kohler-assistant
     ports:
       - "7860:7860"
     environment:
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - LLM_PROVIDER=${LLM_PROVIDER:-openrouter}
       - AGENT_MODEL=${AGENT_MODEL:-nvidia/nemotron-3.5-lightning:free}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-nvidia/nemotron-3.5-lightning:free}
       - SHARE_PROTOTYPE=${SHARE_PROTOTYPE:-false}
     volumes:
-      # Persist Chroma vector store and HuggingFace cache locally across container rebuilds
       - ./chroma_db:/app/chroma_db
-      - hf_cache:/root/.cache/huggingface
     restart: unless-stopped
-
-volumes:
-  hf_cache:
