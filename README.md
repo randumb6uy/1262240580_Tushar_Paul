@@ -198,6 +198,14 @@ Test the autonomous advisor in a fast, lightweight terminal loop:
 python query.py
 ```
 
+### Mental Model & Architecture PDF Reference
+A publication-grade technical specification and architecture guide is included as a PDF:
+```bash
+# Generate / Rebuild the Mental Model PDF
+python generate_mental_model_pdf.py
+```
+Outputs: `Kohler_AI_Advisor_Mental_Model.pdf` (covering the 4-engine model, spatial building code clearances, Indian Rupee math, and zero-lag fallback).
+
 ### Multi-Provider Benchmark
 Compare latency, tool accuracy, and response quality across local and cloud models:
 ```bash
@@ -226,30 +234,33 @@ Access the application at **http://localhost:7860**.
 ```
 RAG-Project/
 ├── docs/
-│   └── products.jsonl        # 30+ structured Kohler luxury product records in INR
+│   └── products.jsonl                 # 30+ structured Kohler luxury product records in INR
 ├── tools/
-│   ├── __init__.py           # Tool exports and registry
-│   ├── bundle_optimizer.py   # Constraint-based suite optimizer & financial engine
-│   ├── catalog.py            # 2-Stage ChromaDB + Cross-Encoder retrieval tool
-│   ├── room_planner.py       # Spatial layout, clearances & fixture capacity tool
-│   ├── calculator.py         # Subtotal, discount & 18% GST quotation tool
-│   └── inventory.py          # Real-time stock status & delivery lead time tool
-├── app.py                    # Polished Gradio Web UI with Spatial Studio & AI Advisor
-├── agent.py                  # LlamaIndex AgentWorkflow & Hybrid Routing orchestrator
-├── router.py                 # Deterministic 0ms intent classifier
-├── ingest.py                 # Self-bootstrapping ChromaDB vector store indexer
-├── query.py                  # Interactive CLI assistant for terminal testing
-├── test_suite.py             # 12-test automated evaluation & verification suite
-├── compare_providers.py      # LLM provider benchmark matrix
-├── Modelfile                 # Custom Ollama Modelfile with spatial system prompt
-├── requirements.txt          # Production-ready Python dependencies
-├── .env.example              # Environment variables template
-├── .gitignore                # Comprehensive Git ignore rules
-├── run_demo.bat              # One-click Windows startup script
-├── run_demo.sh               # One-click Linux/macOS startup script
-├── Dockerfile                # Production Docker container image
-├── docker-compose.yml        # Multi-platform container configuration
-└── README.md                 # Project documentation
+│   ├── __init__.py                    # Tool exports and registry
+│   ├── bundle_optimizer.py            # Constraint-based suite optimizer & financial engine
+│   ├── catalog.py                     # 2-Stage ChromaDB + Cross-Encoder retrieval tool
+│   ├── room_planner.py                # Spatial layout, clearances & fixture capacity tool
+│   ├── calculator.py                  # Subtotal, discount & 18% GST quotation tool
+│   └── inventory.py                   # Real-time stock status & delivery lead time tool
+├── app.py                             # Polished Gradio Web UI with Spatial Studio & AI Advisor
+├── agent.py                           # LlamaIndex AgentWorkflow & Hybrid Routing orchestrator
+├── router.py                          # Deterministic 0ms intent classifier
+├── ingest.py                          # Self-bootstrapping ChromaDB vector store indexer
+├── query.py                           # Interactive CLI assistant for terminal testing
+├── test_suite.py                      # 12-test automated evaluation & verification suite
+├── compare_providers.py               # LLM provider benchmark matrix
+├── generate_mental_model_pdf.py       # Publication-grade Mental Model PDF builder
+├── Kohler_AI_Advisor_Mental_Model.pdf # Generated architectural reference PDF
+├── PROJECT_GUIDE.md                   # Comprehensive technical walkthrough & mental model
+├── Modelfile                          # Custom Ollama Modelfile with spatial system prompt
+├── requirements.txt                   # Production-ready Python dependencies
+├── .env.example                       # Environment variables template
+├── .gitignore                         # Comprehensive Git ignore rules
+├── run_demo.bat                       # One-click Windows startup script
+├── run_demo.sh                        # One-click Linux/macOS startup script
+├── Dockerfile                         # Production Docker container image
+├── docker-compose.yml                 # Multi-platform container configuration
+└── README.md                          # Project documentation
 ```
 
 ---
