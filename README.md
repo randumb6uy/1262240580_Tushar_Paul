@@ -19,7 +19,7 @@ The system features **0ms Fast-Path Intent Routing**, **2-Stage Hybrid RAG (Vect
 | :--- | :--- | :--- |
 | **1. Working Model** | Functional interactive prototype with Gradio Spatial Studio, ReAct Agent & 4 deterministic rule engines | Source code (`app.py`, `agent.py`, `tools/`), `run_demo.bat`, `run_demo.sh`, Docker |
 | **2. Prompts Documentation (PDF)** | Comprehensive documentation of all AI prompts, system instructions, Modelfiles, schemas & workflows | [`Prompts_Documentation.pdf`](Prompts_Documentation.pdf) (Built via `python generate_prompts_pdf.py`) |
-| **3. Video Demonstration** | 1-3 minute video walk-through demonstrating the working model in action | [Video Demonstration Section & Script](#video-demonstration) |
+| **3. Video Demonstration** | 1-3 minute video walk-through demonstrating the working model in action | [`Demo.mp4`](Demo.mp4) / [Walkthrough Script](#video-demonstration) |
 | **4. Presentation Deck (PDF)** | 4-slide executive presentation deck highlighting core approach, system architecture, tech stack & innovation pitch | [`Presentation_Deck.pdf`](Presentation_Deck.pdf) (Built via `python generate_presentation_deck_pdf.py`) |
 | **5. Architectural Reference (PDF)** | Deep-dive mental model and architectural reference guide | [`Kohler_AI_Advisor_Mental_Model.pdf`](Kohler_AI_Advisor_Mental_Model.pdf) |
 
@@ -27,7 +27,7 @@ The system features **0ms Fast-Path Intent Routing**, **2-Stage Hybrid RAG (Vect
 
 ## Video Demonstration
 
-- **Demo Video Walkthrough Link:** [Watch Working Model Demo Video](https://youtu.be/placeholder-demo-video) *(Replace with your unlisted YouTube/Loom/Drive URL)*
+- **Committed Video Demonstration File:** [`Demo.mp4`](Demo.mp4) *(Full HD Walkthrough Video)*
 - **Interactive Live Demo:** Launch locally via `python app.py --share` or `run_demo.bat` to generate a live public URL.
 
 ### 1-3 Minute Demo Walkthrough Flow
