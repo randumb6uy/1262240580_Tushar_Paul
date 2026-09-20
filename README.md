@@ -140,8 +140,8 @@ flowchart TD
 
 ### 2. Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/RAG-Project.git
-cd RAG-Project
+git clone https://github.com/randumb6uy/1262240580_Tushar_Paul.git
+cd 1262240580_Tushar_Paul
 ```
 
 ### 3. Create & Activate Virtual Environment
