@@ -13,7 +13,37 @@ The system features **0ms Fast-Path Intent Routing**, **2-Stage Hybrid RAG (Vect
 
 ---
 
-## Key Features
+## Submission Deliverables & Quick Links
+
+| Deliverable | Description | Reference / Link |
+| :--- | :--- | :--- |
+| **1. Working Model** | Functional interactive prototype with Gradio Spatial Studio, ReAct Agent & 4 deterministic rule engines | Source code (`app.py`, `agent.py`, `tools/`), `run_demo.bat`, `run_demo.sh`, Docker |
+| **2. Prompts Documentation (PDF)** | Comprehensive documentation of all AI prompts, system instructions, Modelfiles, schemas & workflows | [`Prompts_Documentation.pdf`](Prompts_Documentation.pdf) (Built via `python generate_prompts_pdf.py`) |
+| **3. Video Demonstration** | 1-3 minute video walk-through demonstrating the working model in action | [Video Demonstration Section & Script](#video-demonstration) |
+| **4. Presentation Deck (PDF)** | 4-slide executive presentation deck highlighting core approach, system architecture, tech stack & innovation pitch | [`Presentation_Deck.pdf`](Presentation_Deck.pdf) (Built via `python generate_presentation_deck_pdf.py`) |
+| **5. Architectural Reference (PDF)** | Deep-dive mental model and architectural reference guide | [`Kohler_AI_Advisor_Mental_Model.pdf`](Kohler_AI_Advisor_Mental_Model.pdf) |
+
+---
+
+## Video Demonstration
+
+- **Demo Video Walkthrough Link:** [Watch Working Model Demo Video](https://youtu.be/placeholder-demo-video) *(Replace with your unlisted YouTube/Loom/Drive URL)*
+- **Interactive Live Demo:** Launch locally via `python app.py --share` or `run_demo.bat` to generate a live public URL.
+
+### 1-3 Minute Demo Walkthrough Flow
+1. **0:00 - 0:30 | 0ms Fast-Path Intent Routing & Catalog Overview**:
+   - Type *"Hi"* or *"Show me the catalogue"*. Show instantaneous 0ms response, zero LLM tokens used, and structured INR price tables.
+2. **0:30 - 1:15 | Spatial Studio 3D Constraint Solver**:
+   - Navigate to the **Spatial Studio** tab. Adjust sliders (e.g. 7x8 ft, ₹3,00,000 INR budget, *Modern Minimalist* theme).
+   - Click **"Optimize Bathroom Suite"** to see automatic fixture sizing, building code clearances (15" centerline, 21"-30" front), and 3D top-down visualizer.
+3. **1:15 - 2:00 | Seamless Transfer to AI Sales Advisor**:
+   - Click **"Transfer to Advisor Chat"**. Observe the ReAct orchestrator formulate an itemized proposal with curated Kohler fixtures.
+4. **2:00 - 2:40 | Deterministic Math, 18% GST & Logistics**:
+   - Observe automatic 15% package discount savings, exact 18% GST calculation in INR, and PIN-code warehouse lead times without mental arithmetic hallucinations.
+5. **2:40 - 3:00 | 100% Offline Edge Capability**:
+   - Highlight local Ollama `qwen2.5:3b` execution with zero external cloud dependencies.
+
+---
 
 - **Fast-Path Deterministic Router (0ms Overhead, Zero Tokens)**:
   Instantly routes greetings, full catalog overviews, single-spec lookups, and multi-step tool calls without token usage or latency.
@@ -249,6 +279,10 @@ RAG-Project/
 ├── query.py                           # Interactive CLI assistant for terminal testing
 ├── test_suite.py                      # 12-test automated evaluation & verification suite
 ├── compare_providers.py               # LLM provider benchmark matrix
+├── generate_prompts_pdf.py            # Publication-grade Prompts & Instructions PDF builder
+├── Prompts_Documentation.pdf          # Committed Prompts & System Instructions PDF
+├── generate_presentation_deck_pdf.py  # 4-Slide Executive Pitch Deck PDF builder
+├── Presentation_Deck.pdf              # Committed 4-Slide Presentation Deck PDF
 ├── generate_mental_model_pdf.py       # Publication-grade Mental Model PDF builder
 ├── Kohler_AI_Advisor_Mental_Model.pdf # Generated architectural reference PDF
 ├── PROJECT_GUIDE.md                   # Comprehensive technical walkthrough & mental model
